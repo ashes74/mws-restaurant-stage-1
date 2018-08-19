@@ -1,0 +1,28 @@
+.filter-options {
+  flex-direction: column;
+}
+
+.filter-selectors {
+  width: 100%;
+}
+
+/* restaurant detail view */
+#maincontent {
+  display: flex;
+  flex-direction: column;
+}
+
+.inside #map-container {
+  width: 100%;
+  height: 50vh;
+}
+
+#restaurant-container,
+#reviews-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+#reviews-container h2 {
+  width: 90%;
+}
