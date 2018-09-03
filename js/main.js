@@ -145,6 +145,7 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.alt = `Tile image of ${restaurant.name} in ${restaurant.neighborhood}`
   li.append(image);
 
   const name = document.createElement('h1');
