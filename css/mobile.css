@@ -26,3 +26,12 @@
 #reviews-container h2 {
   width: 90%;
 }
+
+#restaurant-container {
+  order: -1;
+  padding-bottom: 20px;
+}
+
+.inside #map-container {
+  height: 20vh;
+}
