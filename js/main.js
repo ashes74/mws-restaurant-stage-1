@@ -145,7 +145,7 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.alt = `Tile image of ${restaurant.name} in ${restaurant.neighborhood}`
+  image.alt = "" // thumbnail on link does not need an alt text
   li.append(image);
 
   const name = document.createElement('h2');
