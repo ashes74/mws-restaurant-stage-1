@@ -1,0 +1,24 @@
+{
+  "name": "mws-restaurant-stage-1",
+  "version": "1.0.0",
+  "description": "Project 1 for the Udacity Mobile Web Specialist.",
+  "main": "main.js",
+  "repository": "git@gitlab.com:ashes74/mws-restaurant-stage-1.git",
+  "author": "Lori-Anne Ashwood <ashes74@users.noreply.github.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^1.0.3",
+    "grunt-contrib-clean": "^2.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-jshint": "^2.0.0",
+    "grunt-contrib-nodeunit": "^2.0.0",
+    "grunt-contrib-uglify": "^4.0.0",
+    "grunt-mkdir": "^1.0.0"
+  },
+  "dependencies": {
+    "grunt-responsive-images": "^1.10.1"
+  },
+  "scripts": {
+    "start": "python -m SimpleHTTPServer 8000"
+  }
+}

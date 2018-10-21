@@ -143,8 +143,11 @@ createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
   const image = document.createElement('img');
+  const imageLarge = DBHelper.imageUrlForRestaurant(restaurant, "large");
+  const imageSmall = DBHelper.imageUrlForRestaurant(restaurant, "small");
   image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.src = imageSmall;
+  image.srcset = `${imageSmall} 300w ${imageLarge} 500w`
   image.alt = `Tile image of ${restaurant.name} in ${restaurant.neighborhood}`
   li.append(image);
 
