@@ -35,3 +35,7 @@
 .inside #map-container {
   height: 20vh;
 }
+
+nav h1 a {
+  font-size: 1.5rem;
+}
