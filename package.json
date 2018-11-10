@@ -1,0 +1,12 @@
+{
+  "name": "mws-restaurant-stage-1",
+  "version": "1.0.0",
+  "description": "Project 1 for Udacity Mobile Web Specialist nanodegree",
+  "main": "main.js",
+  "repository": "git@gitlab.com:ashes74/mws-restaurant-stage-1.git",
+  "author": "Lori-Anne Ashwood <ashes74@users.noreply.github.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "python -m SimpleHTTPServer 8000"
+  }
+}
