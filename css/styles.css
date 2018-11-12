@@ -9,6 +9,7 @@ p {
   font-size: 10pt;
   color: #333;
   line-height: 1.5;
+  font-display: optional;
 }
 body {
   background-color: #fdfdfd;
