@@ -6,7 +6,7 @@ const browserSync = require('browser-sync').create();
 gulp.task("default", ["styles"], function(){
     gulp.watch("src/sass/**/*.scss", ["styles"]);
     browserSync.init({
-        server: "./"
+        server: "./src"
       });
 })
 
