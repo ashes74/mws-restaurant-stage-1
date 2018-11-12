@@ -1,10 +1,3 @@
-// Add a ServiceWorker script to cache requests to all of the site’s assets (so
-// that any page that has been visited by a user will be accessible when the
-// user is offline) Only caching needs to be implemented, no other ServiceWorker
-// features Which file(s) would you need to register a service worker? Be sure
-// to have a file ready to handle the service worker After the service worker is
-// properly registered, which event(s) are you listening for? What is/are the
-// response(s)?
 const staticCacheName = "mws-rest-reviews-v2"
 const urlsToCache = [
     '/',
@@ -23,7 +16,7 @@ const urlsToCache = [
 ]
 
 self.addEventListener('install', event => {
-    console.log('Attempting to install service worker and cache static assets ');
+    // console.log('Attempting to install service worker and cache static assets ');
     event.waitUntil(caches.open(staticCacheName).then(async cache => {
         try {
             return cache.addAll(urlsToCache);
@@ -34,7 +27,7 @@ self.addEventListener('install', event => {
 })
 
 self.addEventListener('activate', event => {
-    console.log(`Activating service worker`);
+    // console.log(`Activating service worker`);
     event.waitUntil(caches.keys().then(cacheNames => {
         return Promise.all(cacheNames.filter(cacheName => {
             return cacheName.startsWith('mws-rest-reviews-') && cacheName != staticCacheName;
@@ -43,11 +36,10 @@ self.addEventListener('activate', event => {
 })
 
 self.addEventListener('fetch', event => {
-    console.log('Fetch event for ', event.request.url);
+    // console.log('Fetch event for ', event.request.url);
     event.respondWith(caches.match(event.request).then(cachedResponse => {
         // Find and return cached version of the page
         if (cachedResponse) {
-            console.log(`Returning cached results`);
             return cachedResponse;
         }
         // No match found in cache => fetch page via network request
@@ -57,9 +49,7 @@ self.addEventListener('fetch', event => {
                 return caches.match('/404.html');
             }
             const cache = await caches.open(staticCacheName);
-            console.log(`Caching a new url`, event.request.url);
             cache.put(event.request.url, response.clone());
-            console.log(`Returning network results`);
             return response;
         }).catch(error => {
             // Fetch from network didn 't work, unable to access network send offline page
