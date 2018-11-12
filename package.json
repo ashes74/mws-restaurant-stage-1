@@ -8,5 +8,8 @@
   "license": "MIT",
   "scripts": {
     "start": "python -m SimpleHTTPServer 8000"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1"
   }
 }
