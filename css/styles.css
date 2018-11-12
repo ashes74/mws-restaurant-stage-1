@@ -11,6 +11,7 @@ p {
   line-height: 1.5;
   font-display: optional;
 }
+
 body {
   background-color: #fdfdfd;
   margin: 0;
@@ -99,10 +100,8 @@ header {
 }
 nav {
   width: 100%;
-  height: 80px;
   background-color: #3f6d8f;
   text-align: center;
-  display: flex;
 }
 nav h1 {
   margin: auto;
@@ -122,7 +121,7 @@ nav h1 a {
   font-size: 17px;
   margin: 0;
   font-weight: 800;
-  /* width: calc(50% - 80px); */
+  text-align: left;
 }
 
 /* Display list items side by side */
@@ -154,6 +153,10 @@ nav h1 a {
   height: 400px;
   width: 100%;
   background-color: #ccc;
+}
+
+#map:focus {
+  outline: 3px solid orange;
 }
 
 #map-container {

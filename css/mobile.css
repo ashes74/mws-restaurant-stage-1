@@ -39,3 +39,7 @@
 nav h1 a {
   font-size: 1.5rem;
 }
+
+#breadcrumb {
+ text-align: center;
+}
