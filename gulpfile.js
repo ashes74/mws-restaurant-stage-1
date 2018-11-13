@@ -3,6 +3,7 @@ const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const browserSync = require('browser-sync').create();
 const eslint = require('gulp-eslint');
+const jest = require('gulp-jest').default;
 
 gulp.task("default", ["styles"], function(){
     gulp.watch("/sass/**/*.scss", ["styles"]);
@@ -41,4 +42,15 @@ gulp.task("styles", function() {
             // lint error, return the stream and pipe to failOnError last.
             .pipe(eslint.failOnError())
     );
+});
+
+gulp.task('jest', function() {
+    return gulp
+        .src('__tests__')
+        .pipe(jest({
+            "verbose": true,
+            "preprocessorIgnorePatterns": [
+                "./dist/", "./node_modules/"
+              ],
+        }));
 });
