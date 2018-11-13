@@ -8,7 +8,7 @@ var markers = []
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
-  initMap(); // added 
+  initMap(); // added
   fetchNeighborhoods();
   fetchCuisines();
 });
@@ -73,18 +73,24 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
  */
 initMap = () => {
   self.newMap = L.map('map', {
-        center: [40.722216, -73.987501],
-        zoom: 12,
-        scrollWheelZoom: false
-      });
-  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-    mapboxToken: 'pk.eyJ1IjoidHN0a3MiLCJhIjoiY2lvM2c2c2g5MDBoZ3Y0a3FmMWo2NGFrZiJ9.fIKUzwIFv3qDd0W2C1fpdA',
+    center: [
+      40.722216, -73.987501
+    ],
+    zoom: 12,
+    scrollWheelZoom: false
+  });
+  L
+    .tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken' +
+      '}', {
+    mapboxToken: 'pk.eyJ1IjoidHN0a3MiLCJhIjoiY2lvM2c2c2g5MDBoZ3Y0a3FmMWo2NGFrZiJ9.fIKUzwIFv3qDd0W2' +
+        'C1fpdA',
     maxZoom: 18,
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-      '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-      'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contr' +
+        'ibutors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,' +
+        ' Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     id: 'mapbox.streets'
-  }).addTo(newMap);
+  })
+    .addTo(newMap);
 
   updateRestaurants();
 }
@@ -123,7 +129,9 @@ resetRestaurants = (restaurants) => {
 
   // Remove all map markers
   if (self.markers) {
-    self.markers.forEach(marker => marker.remove());
+    self
+      .markers
+      .forEach(marker => marker.remove());
   }
   self.markers = [];
   self.restaurants = restaurants;
@@ -183,7 +191,9 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     function onClick() {
       window.location.href = marker.options.url;
     }
-    self.markers.push(marker);
+    self
+      .markers
+      .push(marker);
   });
 
-} 
+}
