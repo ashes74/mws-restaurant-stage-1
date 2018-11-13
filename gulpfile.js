@@ -4,6 +4,7 @@ const autoprefixer = require('gulp-autoprefixer');
 const browserSync = require('browser-sync').create();
 const eslint = require('gulp-eslint');
 const jest = require('gulp-jest').default;
+const babel = require("gulp-babel");
 
 gulp.task('default', ['copy-html', 'copy-images', 'styles', 'lint'], function(){
     gulp.watch('/sass/**/*.scss', ['styles']);
@@ -45,6 +46,7 @@ gulp.task('styles', function() {
     return (
         gulp
             .src(['src/js/**/*.js'])
+            .pipe(babel())
             // eslint() attaches the lint output to the eslint property
             // of the file object so it can be used by other modules.
             .pipe(eslint())
@@ -58,6 +60,7 @@ gulp.task('styles', function() {
 });
 
 gulp.task('jest', function() {
+
     return gulp
         .src('__tests__')
         .pipe(jest({

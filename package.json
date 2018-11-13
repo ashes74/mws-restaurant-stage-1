@@ -10,10 +10,13 @@
     "start": "python -m SimpleHTTPServer 8000"
   },
   "devDependencies": {
+    "@babel/core": "^7.1.5",
+    "@babel/preset-env": "^7.1.5",
     "eslint": "^5.9.0",
     "eslint-config-google": "^0.11.0",
     "gulp": "^3.9.1",
-    "gulp-autoprefixer": "^6.0.0"
+    "gulp-autoprefixer": "^6.0.0",
+    "gulp-babel": "^8.0.0-beta.2"
   },
   "dependencies": {
     "browser-sync": "^2.26.3",
