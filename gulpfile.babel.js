@@ -1,41 +1,51 @@
 'use strict';
 
-import {task, watch, src, dest} from "gulp";
+import {watch, src, dest, parallel} from "gulp";
 import sass, {logError} from 'gulp-sass';
 import autoprefixer from 'gulp-autoprefixer';
 import browserSync from 'browser-sync';
-import eslinat, {format, failOnError} from 'gulp-eslint';
+import eslint, {format, failOnError} from 'gulp-eslint';
 import jest from 'gulp-jest';
-import babel from "gulp-babel";
 
-task('default', [
-    'copy-html', 'copy-images', 'styles', 'lint'
-], function () {
-    watch('/sass/**/*.scss', ['styles']);
-    watch('/js/**/*.js', ['lint']);
-    watch('/src/index.html', ['copy-html']);
+const stylesWatcher = watch('/sass/**/*.scss', styles);
+const lintWatcher = watch('/js/**/*.js', lint);
+const copyHtmlWatcher = watch('/src/index.html', copyHtml);
+
+stylesWatcher.on('all',(...args)=>{
+    console.log(args);
+})
+lintWatcher.on('all',(...args)=>{
+    console.log(args);
+})
+copyHtmlWatcher.on('all',(...args)=>{
+    console.log(args);
+})
+
+function start(){
     browserSync({server: './dist'});
-})
+}
 
-task('copy-html', function () {
-    src('./src/index.html').pipe(dest('./dist'))
-})
+export default parallel( copyHtml, copyImages, styles, lint, start)
 
-task('copy-images', function () {
-    src('./src/img/*').pipe(dest('./dist/img'))
-})
+export function copyHtml () {
+   return src('./src/index.html').pipe(dest('./dist'))
+}
+ 
+export function copyImages() {
+   return src('./src/img/*').pipe(dest('./dist/img'))
+}
 
-task('styles', function () {
-    src('src/sass/**/*.scss')
+export function styles () {
+   return src('src/sass/**/*.scss')
         .pipe(sass({outputStyle: 'compressed'}))
         .on('error', logError)
         .pipe(autoprefixer({browsers: ['last 2 versions']}))
         .pipe(dest('dist/css'))
         .pipe(browserSync.stream());
-});
+}
 
 //copied from course materials
-task('lint', function () {
+export function lint () {
     return (src(['src/js/**/*.js'])
     // eslint() attaches the lint output to the eslint property of the file object
     // so it can be used by other modules.
@@ -46,12 +56,11 @@ task('lint', function () {
     // To have the process exit with an error code (1) on lint error, return the
     // stream and pipe to failOnError last.
         .pipe(failOnError()));
-});
+}
 
-task('jest', function () {
-
+export function test () {
     return src('__tests__').pipe(jest({
         "verbose": true,
         "preprocessorIgnorePatterns": ["./dist/", "./node_modules/"]
     }));
-});
+}
