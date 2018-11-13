@@ -7,30 +7,42 @@ import browserSync from 'browser-sync';
 import eslint, {format, failOnError} from 'gulp-eslint';
 import jest from 'gulp-jest';
 
-const stylesWatcher = watch('/sass/**/*.scss', styles);
-const lintWatcher = watch('/js/**/*.js', lint);
-const copyHtmlWatcher = watch('/src/index.html', copyHtml);
 
-stylesWatcher.on('all',(...args)=>{
-    console.log(args);
-})
-lintWatcher.on('all',(...args)=>{
-    console.log(args);
-})
-copyHtmlWatcher.on('all',(...args)=>{
-    console.log(args);
-})
-
-function start(){
-    browserSync({server: './dist'});
+export function start() {
+    const stylesWatcher = watch('/sass/**/*.scss', styles);
+    const lintWatcher = watch('/js/**/*.js', lint);
+    const copyHtmlWatcher = watch('/src/index.html', copyHtml);
+    
+    stylesWatcher.on('all',(...args)=>{
+        console.log(args);
+    })
+    lintWatcher.on('all',(...args)=>{
+        console.log(args);
+    })
+    copyHtmlWatcher.on('all',(...args)=>{
+        console.log(args);
+    })
+    browserSync({
+        server: './dist',
+    });
 }
 
-export default parallel( copyHtml, copyImages, styles, lint, start)
+export default parallel( copyHtml, copyImages, styles, lint, copyJS, copyData, start)
+
+//TODO: get data from server
+function copyData (){
+    return src('src/data/restaurants.json').pipe(dest('./dist/data'))
+}
 
 export function copyHtml () {
-   return src('./src/index.html').pipe(dest('./dist'))
+   return src(['./src/**/*.html', './src/sw.js']).pipe(dest('./dist', {overwrite: true}))
 }
- 
+
+//TODO: minify and concatenate js
+export function copyJS () {
+   return src('./src/js/**/*.js').pipe(dest('./dist/js', {overwrite: true}))
+}
+
 export function copyImages() {
    return src('./src/img/*').pipe(dest('./dist/img'))
 }
