@@ -5,15 +5,26 @@ const browserSync = require('browser-sync').create();
 const eslint = require('gulp-eslint');
 const jest = require('gulp-jest').default;
 
-gulp.task("default", ["styles"], function(){
-    gulp.watch("/sass/**/*.scss", ["styles"]);
+gulp.task('default', ['copy-html', 'copy-images', 'styles', 'lint'], function(){
+    gulp.watch('/sass/**/*.scss', ['styles']);
     gulp.watch('/js/**/*.js', ['lint']);
+    gulp.watch('/src/index.html', ['copy-html']);
     browserSync.init({
-        server: "./src"
+        server: './dist'
       });
 })
 
-gulp.task("styles", function() {
+gulp.task('copy-html', function(){
+    gulp.src('./src/index.html')
+    .pipe(gulp.dest('./dist'))
+})
+
+gulp.task('copy-images', function(){
+    gulp.src('./src/img/*')
+    .pipe(gulp.dest('./dist/img'))
+})
+
+gulp.task('styles', function() {
     gulp
       .src('src/sass/**/*.scss')
       .pipe(sass({
