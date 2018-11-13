@@ -11,9 +11,11 @@
   },
   "babel": {
     "presets": [
-      "es2015",
       "@babel/preset-env"
     ]
+  },
+  "eslintConfig":{
+    "parserOptions": { "ecmaVersion": 6 }
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
