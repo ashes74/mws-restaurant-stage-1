@@ -40,7 +40,7 @@ class DBHelper {
       callback(null, await response.json());
     }
     catch (err) {
-      console.error(`Restaurant does not exist. ${err}`);
+      console.error(`Restaurant with ${id} does not exist. ${err}`);
     }
   }
 
@@ -55,7 +55,7 @@ class DBHelper {
     const results = restaurants.filter(r => r.cuisine_type == cuisine);
     callback(null, results);
    }catch (err) {
-    console.error(`Restaurant does not exist. ${err}`);
+    console.error(`Error fetching restaurants with ${cuisine}. ${err}`);
   }
   }
 
@@ -70,7 +70,7 @@ class DBHelper {
     const results = restaurants.filter(r => r.neighborhood == neighborhood);
     callback(null, results);
    }catch (err) {
-    console.error(`Restaurant does not exist. ${err}`);
+    console.error(`Error fetching restaurants with ${neighborhood}. ${err}`);
   }
   }
 
@@ -90,7 +90,7 @@ class DBHelper {
     }
     callback(null, results);
   }catch (err) {
-    console.error(`Restaurant does not exist. ${err}`);
+    console.error(`Error fetching restaurants with ${cuisine} and ${neighborhood}. ${err}`);
   }
   }
 
@@ -104,10 +104,11 @@ class DBHelper {
     // Get all neighborhoods from all restaurants
     const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
     // Remove duplicates from neighborhoods
+    // TODO: convert to Set
     const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
     callback(null, uniqueNeighborhoods);
    }catch (err) {
-    console.error(`Restaurant does not exist. ${err}`);
+    console.error(`Error fetching neighborhoods. ${err}`);
   }
   }
 
@@ -121,10 +122,11 @@ class DBHelper {
     // Get all cuisines from all restaurants
     const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
     // Remove duplicates from cuisines
+    //TODO: convert to Set
     const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
     callback(null, uniqueCuisines);
    }catch (err) {
-    console.error(`Restaurant does not exist. ${err}`);
+    console.error(`Error fetching cuisines. ${err}`);
   }
   }
 
