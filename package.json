@@ -18,7 +18,7 @@
     "parserOptions": {
       "ecmaVersion": 2017,
       "sourceType": "module"
-    } 
+    }
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "browser-sync": "^2.26.3",
+    "gulp-concat": "^2.6.1",
     "gulp-eslint": "^5.0.0",
     "gulp-jest": "^4.0.2",
     "gulp-sass": "^4.0.2",
