@@ -43,7 +43,10 @@ self.addEventListener('fetch', event => {
             return cachedResponse;
         }
         // No match found in cache => fetch page via network request
-        return fetch(event.request).then(async response => {
+        return fetch(event.request, {
+            method: 'GET',
+            mode: 'cors'
+        }).then(async response => {
             // No match found on network => page does not exist return 404
             if (response.status === 404) {
                 return caches.match('/404.html');

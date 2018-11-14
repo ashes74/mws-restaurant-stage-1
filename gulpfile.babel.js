@@ -1,78 +1,100 @@
 'use strict';
 
-import {watch, src, dest, parallel} from "gulp";
-import sass, {logError} from 'gulp-sass';
+import { watch, src, dest, parallel, series } from "gulp";
+import _sass, { logError } from 'gulp-sass';
 import autoprefixer from 'gulp-autoprefixer';
-import browserSync from 'browser-sync';
-import eslint, {format, failOnError} from 'gulp-eslint';
+import eslint, { format, failOnError } from 'gulp-eslint';
 import jest from 'gulp-jest';
+import del from 'del';
 
+const browserSync = require('browser-sync').create();
 
-export function start() {
-    const stylesWatcher = watch('/sass/**/*.scss', styles);
-    const lintWatcher = watch('/js/**/*.js', lint);
-    const copyHtmlWatcher = watch('/src/index.html', copyHtml);
-    
-    stylesWatcher.on('all',(...args)=>{
-        console.log(args);
-    })
-    lintWatcher.on('all',(...args)=>{
-        console.log(args);
-    })
-    copyHtmlWatcher.on('all',(...args)=>{
-        console.log(args);
-    })
-    browserSync({
-        server: './dist',
+// NB: if change file structure can update src and dest quicker as variables
+const paths = {
+    js: {
+        src: 'src/**/*.js',
+        dest: 'dist/'
+    },
+    sw: {
+        src: 'src/sw.js',
+        dest: 'dist/'
+    },
+    html: {
+        src: 'src/**/*.html',
+        dest: 'dist/'
+    },
+    sass: {
+        src: 'src/sass/**/*.scss',
+        dest: 'dist/css'
+    },
+    images: {
+        src: 'src/img/*',
+        dest: 'dist/img'
+    },
+    app: {
+        src: 'src',
+        dest: 'dist'
+    }
+}
+
+export function _watch() {
+    watch(paths.sass.src, {}, styles);
+    watch(paths.js.src, {}, series(lint, copyJS));
+    watch(paths.html.src, {}, copyHtml);
+}
+
+export function sync() {
+    _watch()
+    browserSync.init({
+        port: 3000,
+        server: {
+            baseDir: './dist'
+        }
     });
 }
 
-export default parallel( copyHtml, copyImages, styles, lint, copyJS, copyData, start)
+export default series(clean, parallel(copyHtml, copyImages, styles, lint, copyJS), sync)
 
-//TODO: get data from server
-function copyData (){
-    return src('src/data/restaurants.json').pipe(dest('./dist/data'))
-}
-
-export function copyHtml () {
-   return src(['./src/**/*.html', './src/sw.js']).pipe(dest('./dist', {overwrite: true}))
+export function copyHtml() {
+    return src(paths.html.src)
+        .pipe(dest(paths.html.dest, { overwrite: true }))
+        .pipe(browserSync.stream({ match: "**/*.html" }))
 }
 
 //TODO: minify and concatenate js
-export function copyJS () {
-   return src('./src/js/**/*.js').pipe(dest('./dist/js', {overwrite: true}))
+export function copyJS() {
+    return src(paths.js.src, {base:'./src'})
+        .pipe(dest(paths.js.dest, { overwrite: true }))
+        .pipe(browserSync.stream({ match: "**/*.js" }))
 }
 
 export function copyImages() {
-   return src('./src/img/*').pipe(dest('./dist/img'))
+    return src(paths.images.src).pipe(dest(paths.images.dest))
 }
 
-export function styles () {
-   return src('src/sass/**/*.scss')
-        .pipe(sass({outputStyle: 'compressed'}))
+export function styles() {
+    return src(paths.sass.src)
+        .pipe(_sass({ outputStyle: 'compressed' }))
         .on('error', logError)
-        .pipe(autoprefixer({browsers: ['last 2 versions']}))
-        .pipe(dest('dist/css'))
-        .pipe(browserSync.stream());
+        .pipe(autoprefixer({ browsers: ['last 2 versions'] }))
+        .pipe(dest(paths.sass.dest))
+        .pipe(browserSync.stream({ match: "**/*.css" }));
 }
 
-//copied from course materials
-export function lint () {
-    return (src(['src/js/**/*.js'])
-    // eslint() attaches the lint output to the eslint property of the file object
-    // so it can be used by other modules.
+export function lint() {
+    return (src([paths.js.src])
         .pipe(eslint())
-    // eslint.format() outputs the lint results to the console. Alternatively use
-    // eslint.formatEach() (see Docs).
         .pipe(format())
-    // To have the process exit with an error code (1) on lint error, return the
-    // stream and pipe to failOnError last.
-        .pipe(failOnError()));
+        .pipe(failOnError()))
 }
 
-export function test () {
+export function test() {
     return src('__tests__').pipe(jest({
         "verbose": true,
         "preprocessorIgnorePatterns": ["./dist/", "./node_modules/"]
     }));
+}
+
+export function clean() {
+    return del(paths.app.dest);
 }
