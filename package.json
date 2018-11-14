@@ -16,8 +16,9 @@
   },
   "eslintConfig": {
     "parserOptions": {
-      "ecmaVersion": 2017
-    }
+      "ecmaVersion": 2017,
+      "sourceType": "module"
+    } 
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
