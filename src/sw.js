@@ -12,7 +12,8 @@ const urlsToCache = [
     '/img/notfound.jpg',
     'https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.woff2',
     'https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmEU9fBBc4AMP6lQ.woff2',
-    '/favicon.png'
+    '/img/favicon.png',
+    '/img/offline.jpg'
 ]
 
 self.addEventListener('install', event => {
@@ -21,19 +22,20 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(staticCacheName)
         .then(cache => cache.addAll(urlsToCache))
-        .catch(err => {console.error("Cache open failure", err)})
+        .catch(err => {console.error(`Cache open failure: ${err}`)})
     )
 })
 
-self.addEventListener('activate', event => {
+self.addEventListener('activate', event => {  
     console.log('Service worker activating...');
     event.waitUntil(
         caches.keys()
         .then(cacheNames => {
+            console.log('Removing all redundant caches');          
         return Promise.all(
             cacheNames
             .filter(cacheName => {
-                return cacheName.startsWith('mws-rest-reviews-') && cacheName != staticCacheName;
+                return cacheName.startsWith('mws-rest-reviews-') && cacheName !== staticCacheName;
             })
             .map(cacheName => caches.delete(cacheName))
         )       
@@ -43,20 +45,44 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     // console.log('Fetch event for ', event.request.url);
     event.respondWith(
-        caches.match(event.request)
-        .then(cachedResponse => {
-        // Find and return cached version of the page
-        if (cachedResponse) return cachedResponse;
-        // No match found in cache => fetch page via network request
-        return fetch(event.request)
-        .then(response => {
-            // No match found on network => page does not exist return 404
-            if (response.status === 404) return caches.match('/404.html');
-            return response;
-        }).catch(error => {
-            // Fetch from network didn 't work, unable to access network send offline page
-            console.error(error);
-            return caches.match('/offline.html');
-        })
+        caches.open(staticCacheName)
+        .then(async cache=>{
+            // console.log(`Looking for a cached match for`, event.request);           
+            try {
+                const cachedResponse = await cache.match(event.request.url);
+                // cachedResponse&& console.log(`cached response:`, cachedResponse);
+                
+                return cachedResponse || fetchFromNetwork(event.request);
+            }
+            catch (error) {
+                // Fetch from network didn 't work, unable to access network send offline page
+                console.error(`Fetch failed`, error);
+                return caches.match('/offline.html');
+            }
+    }, err =>{
+        console.error(`Cache open failure:`, err)
+        new Response(`Cache open failure: `, err)
     }))
 })
+
+ // No match found in cache => fetch page via network request
+async function fetchFromNetwork(request){
+    // console.log('Fetching from the network');
+    
+    try{
+        const networkResponse = await fetch(request);
+        // console.log('Network response is:' , {response: networkResponse.clone()})
+        // No match found on network => page does not exist return 404
+        const cache = await caches.open(staticCacheName)
+        if (networkResponse.status === 404) {
+            return cache.match('/404.html');
+        }
+        if(request.method==='GET') cache.put(request, networkResponse.clone());
+        return networkResponse;
+    }catch(err){
+        console.error(`Error fetching from network,`, request, err);
+        // return new Response(`Error fetching from network, `, err);
+        const cache = await caches.open(staticCacheName)
+        return cache.match('/offline.html')
+    }
+}
