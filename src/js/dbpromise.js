@@ -1,15 +1,21 @@
 import idb from 'idb';
 
-let dbPromise = idb.open('mws-rest-reviews', 1, upgradeDb =>{
-    if(!window.indexedDB) return console.log(`IndexedDB not supported in this browser`)
-    let restaurantStore = upgradeDb.createObjectStore('restaurants',{keyPath: 'id'});
-    restaurantStore.createIndex('id', 'id')
+//create DB
+const dbInit = idb.open('mws-rest-reviews', 1, upgradeDb => {
+    //check that it's supported
+    if (!window.indexedDB) return console.log(`IndexedDB not supported in this browser`)
+    // if supported create store 
+    let restaurantStore = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
 })
 
-export  const fetchAllRestaurantsFromDb = async ()=>{
-    let db = await dbPromise
-    let tx =db.transaction('restaurants');
+const fetchAllRestaurantsFromDb =  async () => {
+    let db = await dbInit
+    let tx = db.transaction('restaurants');
     let restaurantStore = tx.objectStore('restaurants');
-    let idIdx = restaurantStore.index('id');
-    return idIdx.getAll();
+    return restaurantStore.getAll();
+}
+
+
+export default dbPromise = {
+    fetchAllRestaurantsFromDb
 }
