@@ -6,6 +6,7 @@ import autoprefixer from 'gulp-autoprefixer';
 import eslint, { format, failOnError } from 'gulp-eslint';
 import jest from 'gulp-jest';
 import del from 'del';
+import babel from 'gulp-babel';
 
 const browserSync = require('browser-sync').create();
 
@@ -39,9 +40,9 @@ const paths = {
 }
 
 export function _watch() {
-    watch(paths.sass.src, {}, sass);
-    watch(paths.js.src, {}, copyJS);
-    watch(paths.html.src, {}, copyHtml);
+    watch(paths.sass.src, sass);
+    watch(paths.js.src, copyJS);
+    watch(paths.html.src, copyHtml);
 }
 
 export function sync() {
