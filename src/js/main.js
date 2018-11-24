@@ -3,9 +3,9 @@ import { registerServiceWorker } from '../register';
 
 let restaurants,
   neighborhoods,
-  cuisines
-var newMap
-var markers = []
+  cuisines;
+var newMap;
+var markers = [];
 
 
 /**
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   console.log('Document loaded registering service worker, fetching neighborhoods and cuisines');
   
   registerServiceWorker();
-  // initMap(); // added
+  initMap(); // added
   fetchNeighborhoods();
   fetchCuisines();
 });
@@ -38,9 +38,8 @@ const fetchNeighborhoods = () => {
  * Set neighborhoods HTML.
  */
 const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
-  console.log('Populating neighborhood grid');
-  
   const select = document.getElementById('neighborhoods-select');
+  select.onchange = updateRestaurants;
   neighborhoods.forEach(neighborhood => {
     const option = document.createElement('option');
     option.innerHTML = neighborhood;
@@ -68,6 +67,8 @@ const fetchCuisines = () => {
  */
 const fillCuisinesHTML = (cuisines = self.cuisines) => {
   const select = document.getElementById('cuisines-select');
+  select.onchange = updateRestaurants;
+
 
   cuisines.forEach(cuisine => {
     const option = document.createElement('option');
@@ -88,19 +89,14 @@ const initMap = () => {
       zoom: 12,
       scrollWheelZoom: false
     });
-  L
-    .tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken' +
-      '}', {
-        mapboxToken: 'pk.eyJ1IjoidHN0a3MiLCJhIjoiY2lvM2c2c2g5MDBoZ3Y0a3FmMWo2NGFrZiJ9.fIKUzwIFv3qDd0W2' +
-          'C1fpdA',
-        maxZoom: 18,
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contr' +
-          'ibutors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,' +
-          ' Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        id: 'mapbox.streets'
-      })
-    .addTo(newMap);
-
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
+      mapboxToken: 'pk.eyJ1IjoidHN0a3MiLCJhIjoiY2lvM2c2c2g5MDBoZ3Y0a3FmMWo2NGFrZiJ9.fIKUzwIFv3qDd0W2C1fpdA',
+      maxZoom: 18,
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      id: 'mapbox.streets'
+    }).addTo(self.newMap);
   updateRestaurants();
 }
 
@@ -150,6 +146,8 @@ const resetRestaurants = (restaurants) => {
  * Create all restaurants HTML and add them to the webpage.
  */
 const fillRestaurantsHTML = (restaurants = self.restaurants) => {
+  console.log('Populating restaurants grid', restaurants);
+
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
