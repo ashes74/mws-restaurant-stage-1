@@ -1,7 +1,9 @@
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
 const path = require('path')
+const webpack = require('webpack');
 
+// TODO: run everything from webpack
 module.exports = {
     mode: "development",
     entry: {
@@ -48,5 +50,6 @@ module.exports = {
         new ServiceWorkerWebpackPlugin({
             entry: path.join(__dirname, 'src/sw.js'),
           }),
+        new webpack.HotModuleReplacementPlugin()
     ],
 }
