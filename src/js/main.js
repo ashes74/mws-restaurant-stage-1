@@ -1,4 +1,5 @@
 const DBHelper = require("./dbhelper");
+import {registerServiceWorker} from '../register';
 
 let restaurants,
   neighborhoods,
@@ -6,26 +7,12 @@ let restaurants,
 var newMap
 var markers = []
 
-// TO DO: Return service worker registration to separate file
-
-/**
- * Register service worker
- */
-
-if (navigator.serviceWorker) {
-  window.addEventListener('load', function () {
-      navigator
-          .serviceWorker
-          .register('/sw.js')
-          .then(registration => console.log(`Registration successful`, registration))
-          .catch(err => console.log(`Registratation failed ${err}`))
-  })
-}
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+  registerServiceWorker();
   initMap(); // added
   fetchNeighborhoods();
   fetchCuisines();
