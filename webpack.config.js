@@ -1,6 +1,4 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     mode: "development",
@@ -10,7 +8,6 @@ module.exports = {
     },
     output: {
         path: __dirname + '/dist',
-        // filename: "[name].[chunkhash:8].js"
         filename: "[name].js"
     },
     devtool: "source-map",
@@ -46,17 +43,5 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
-        // new CopyWebpackPlugin([
-        //     {
-        //         from: './src/**/**.html',
-        //         to: '[name].html'
-        //     }, {
-        //         from: './src/img/**.*',
-        //         to: 'img/[name].[ext]'
-        //     }
-        // ]),
-
-        // new HtmlWebpackPlugin()
     ],
-    // watch: true
 }
