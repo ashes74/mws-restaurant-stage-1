@@ -23,9 +23,10 @@ export default class DBHelper {
         method: 'GET',
         mode: 'cors'
       })
+      // TODO: fetch from db if present/while offline
+      dbPromise.putRestaurants(await response.clone().json())
       return await response.json();
-    }
-    catch (err) {
+    } catch (err) {
       console.error(`Request failed. Returned status of ${err.status}. ${err}`);
     }
   }
@@ -40,8 +41,7 @@ export default class DBHelper {
         mode: 'cors'
       })
       callback(null, await response.json());
-    }
-    catch (err) {
+    } catch (err) {
       console.error(`Restaurant with ${id} does not exist. ${err}`);
     }
   }
@@ -51,14 +51,14 @@ export default class DBHelper {
    */
   static async fetchRestaurantByCuisine(cuisine, callback) {
     // Fetch all restaurants  with proper error handling
-   try{
-    const restaurants = await DBHelper.fetchRestaurants()
-    // Filter restaurants to have only given cuisine type
-    const results = restaurants.filter(r => r.cuisine_type == cuisine);
-    callback(null, results);
-   }catch (err) {
-    console.error(`Error fetching restaurants with ${cuisine}. ${err}`);
-  }
+    try {
+      const restaurants = await DBHelper.fetchRestaurants()
+      // Filter restaurants to have only given cuisine type
+      const results = restaurants.filter(r => r.cuisine_type == cuisine);
+      callback(null, results);
+    } catch (err) {
+      console.error(`Error fetching restaurants with ${cuisine}. ${err}`);
+    }
   }
 
   /**
@@ -66,14 +66,14 @@ export default class DBHelper {
    */
   static async fetchRestaurantByNeighborhood(neighborhood, callback) {
     // Fetch all restaurants
-   try{
-    const restaurants = await DBHelper.fetchRestaurants()
-    // Filter restaurants to have only given neighborhood
-    const results = restaurants.filter(r => r.neighborhood == neighborhood);
-    callback(null, results);
-   }catch (err) {
-    console.error(`Error fetching restaurants with ${neighborhood}. ${err}`);
-  }
+    try {
+      const restaurants = await DBHelper.fetchRestaurants()
+      // Filter restaurants to have only given neighborhood
+      const results = restaurants.filter(r => r.neighborhood == neighborhood);
+      callback(null, results);
+    } catch (err) {
+      console.error(`Error fetching restaurants with ${neighborhood}. ${err}`);
+    }
   }
 
   /**
@@ -81,19 +81,19 @@ export default class DBHelper {
    */
   static async fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
     // Fetch all restaurants
-   try{
-    const restaurants = await DBHelper.fetchRestaurants()
-    let results = restaurants
-    if (cuisine != 'all') { // filter by cuisine
-      results = results.filter(r => r.cuisine_type == cuisine);
+    try {
+      const restaurants = await DBHelper.fetchRestaurants()
+      let results = restaurants
+      if (cuisine != 'all') { // filter by cuisine
+        results = results.filter(r => r.cuisine_type == cuisine);
+      }
+      if (neighborhood != 'all') { // filter by neighborhood
+        results = results.filter(r => r.neighborhood == neighborhood);
+      }
+      callback(null, results);
+    } catch (err) {
+      console.error(`Error fetching restaurants with ${cuisine} and ${neighborhood}. ${err}`);
     }
-    if (neighborhood != 'all') { // filter by neighborhood
-      results = results.filter(r => r.neighborhood == neighborhood);
-    }
-    callback(null, results);
-  }catch (err) {
-    console.error(`Error fetching restaurants with ${cuisine} and ${neighborhood}. ${err}`);
-  }
   }
 
   /**
@@ -101,17 +101,17 @@ export default class DBHelper {
    */
   static async fetchNeighborhoods(callback) {
     // Fetch all restaurants
-   try{
-    const restaurants = await DBHelper.fetchRestaurants()
-    // Get all neighborhoods from all restaurants
-    const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
-    // Remove duplicates from neighborhoods
-    // TODO: convert to Set
-    const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
-    callback(null, uniqueNeighborhoods);
-   }catch (err) {
-    console.error(`Error fetching neighborhoods. ${err}`);
-  }
+    try {
+      const restaurants = await DBHelper.fetchRestaurants()
+      // Get all neighborhoods from all restaurants
+      const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
+      // Remove duplicates from neighborhoods
+      // TODO: convert to Set
+      const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
+      callback(null, uniqueNeighborhoods);
+    } catch (err) {
+      console.error(`Error fetching neighborhoods. ${err}`);
+    }
   }
 
   /**
@@ -119,17 +119,17 @@ export default class DBHelper {
    */
   static async fetchCuisines(callback) {
     // Fetch all restaurants
-   try{
-    const restaurants = await DBHelper.fetchRestaurants()
-    // Get all cuisines from all restaurants
-    const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
-    // Remove duplicates from cuisines
-    //TODO: convert to Set
-    const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
-    callback(null, uniqueCuisines);
-   }catch (err) {
-    console.error(`Error fetching cuisines. ${err}`);
-  }
+    try {
+      const restaurants = await DBHelper.fetchRestaurants()
+      // Get all cuisines from all restaurants
+      const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
+      // Remove duplicates from cuisines
+      //TODO: convert to Set
+      const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
+      callback(null, uniqueCuisines);
+    } catch (err) {
+      console.error(`Error fetching cuisines. ${err}`);
+    }
   }
 
   /**
@@ -142,7 +142,9 @@ export default class DBHelper {
   /**
    * Restaurant image URL.
    */
-  static imageUrlForRestaurant({ photograph = 'notfound' }) {
+  static imageUrlForRestaurant({
+    photograph = 'notfound'
+  }) {
     return (`/img/${photograph}.jpg`);
   }
 
@@ -154,10 +156,10 @@ export default class DBHelper {
     const marker = new L.marker([
       restaurant.latlng.lat, restaurant.latlng.lng
     ], {
-        title: restaurant.name,
-        alt: restaurant.name,
-        url: DBHelper.urlForRestaurant(restaurant)
-      })
+      title: restaurant.name,
+      alt: restaurant.name,
+      url: DBHelper.urlForRestaurant(restaurant)
+    })
     marker.addTo(map);
     return marker;
   }
