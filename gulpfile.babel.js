@@ -1,14 +1,15 @@
 'use strict';
 
+
 import { watch, src, dest, parallel, series } from "gulp";
 import _sass, { logError } from 'gulp-sass';
 import autoprefixer from 'gulp-autoprefixer';
-import eslint, { format, failOnError } from 'gulp-eslint';
 import jest from 'gulp-jest';
 import del from 'del';
-import babel from 'gulp-babel';
 
 const browserSync = require('browser-sync').create();
+const reload = browserSync.reload;
+const webpack = require('webpack-stream');
 
 // NB: if change file structure can update src and dest quicker as variables
 const paths = {
@@ -73,12 +74,8 @@ function copyHtml() {
 
 function copyJS() {
     return src(paths.js.src, {base: './src'})
+        .pipe(webpack(require('./webpack.config.js')))
     .pipe(dest(paths.js.dest))
-    // start of lint step 
-    .pipe(eslint()) 
-    .pipe(format())
-    .pipe(failOnError())
-    // end of lint step
     .pipe(browserSync.stream({ match: "**/*.js" }))
 }
 

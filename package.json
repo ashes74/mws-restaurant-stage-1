@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
+    "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.1.5",
     "@babel/register": "^7.0.0",
     "babel-loader": "^8.0.4",
@@ -49,6 +50,7 @@
     "webpack-stream": "^5.1.1"
   },
   "dependencies": {
+    "@babel/runtime": "^7.1.5",
     "browser-sync": "^2.26.3",
     "gulp-jest": "^4.0.2",
     "gulp-sass": "^4.0.2",
