@@ -1,24 +1,25 @@
-/* restaurant detail view */
-#maincontent {
-  display: flex;
-}
+@media screen and (min-width:521px) and (max-width:800px) {  /* restaurant detail view */
+  #maincontent {
+    display: flex;
+  }
 
-.inside #map-container {
-  width: 100%;
-  height: 20vh;
-}
+  .inside #map-container {
+    width: 100%;
+    height: 20vh;
+  }
 
-#restaurant-container {
-  width: 100%;
-  order: -1;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  align-items: center;
-  /* justify-content: center; */
-}
+  #restaurant-container {
+    width: 100%;
+    order: -1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    /* justify-content: center; */
+  }
 
-#breadcrumb {
-text-align: center;
+  #breadcrumb {
+  text-align: center;
 
+  }
 }

@@ -83,6 +83,9 @@ export function sass() {
         .pipe(_sass({ outputStyle: 'compressed' }))
         .on('error', logError)
         .pipe(autoprefixer({ browsers: ['last 2 versions'] }))
+        .pipe(sourcemaps.init())
+        .pipe(concat('styles.css'))
+        .pipe(sourcemaps.write('.'))
         .pipe(dest(paths.sass.dest))
         .pipe(browserSync.stream({ match: "**/*.css" }));
 }
