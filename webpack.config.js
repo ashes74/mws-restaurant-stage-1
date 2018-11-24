@@ -1,4 +1,6 @@
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
+const path = require('path')
 
 module.exports = {
     mode: "development",
@@ -7,7 +9,7 @@ module.exports = {
         restaurant: "./src/js/restaurant_info.js"
     },
     output: {
-        path: __dirname + '/dist',
+        path: path.join(__dirname , '/dist'),
         filename: "[name].js"
     },
     devtool: "source-map",
@@ -43,5 +45,8 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
+        new ServiceWorkerWebpackPlugin({
+            entry: path.join(__dirname, 'src/sw.js'),
+          }),
     ],
 }
