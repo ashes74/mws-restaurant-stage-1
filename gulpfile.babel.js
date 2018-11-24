@@ -6,10 +6,8 @@ import _sass, { logError } from 'gulp-sass';
 import autoprefixer from 'gulp-autoprefixer';
 import jest from 'gulp-jest';
 import del from 'del';
-import eslint from 'gulp-eslint';
 
 const sourcemaps = require('gulp-sourcemaps');
-const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 
 const browserSync = require('browser-sync').create();
@@ -78,14 +76,7 @@ function copyHtml() {
 
 function copyJS() {
     return src(paths.js.src, {base: './src'})
-        // .pipe(eslint())
-        // .pipe(eslint.format())
-        // .pipe(eslint.failAfterError())
-        // .pipe(sourcemaps.init())
-        // .pipe(babel({presets: ['@babel/preset-env']}))
-        // .pipe(concat('bundle.js'))
-        // .pipe(sourcemaps.write('.'))
-        .pipe(webpack(require('./webpack.config.js')))
+        .pipe(webpack(require('./webpack.config')))
         .pipe(dest(paths.js.dest))
         .pipe(browserSync.stream({match: "**/*.js"}))
 }

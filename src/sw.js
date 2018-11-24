@@ -2,11 +2,8 @@ const staticCacheName = "mws-rest-reviews-v2"
 const urlsToCache = [
     '/',
     '/js/main.js',
-    '/js/restaurant_info.js',
-    '/js/dbhelper.js',
+    '/js/restaurant.js',
     '/css/styles.css',
-    '/css/mobile.css',
-    '/css/under800.css',
     '/404.html',
     '/offline.html',
     '/img/notfound.jpg',
