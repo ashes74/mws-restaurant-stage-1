@@ -6,6 +6,11 @@ import _sass, { logError } from 'gulp-sass';
 import autoprefixer from 'gulp-autoprefixer';
 import jest from 'gulp-jest';
 import del from 'del';
+import eslint from 'gulp-eslint';
+
+const sourcemaps = require('gulp-sourcemaps');
+const babel = require('gulp-babel');
+const concat = require('gulp-concat');
 
 const browserSync = require('browser-sync').create();
 const webpack = require('webpack-stream');
@@ -35,7 +40,7 @@ const paths = {
     app: {
         src: 'src/**',
         dest: 'dist/',
-       
+
     }
 }
 
@@ -48,7 +53,7 @@ export function _watch() {
 export function sync() {
     _watch()
     browserSync.init({
-        port: 8000,
+        port: 9000,
         server: {
             baseDir: './dist'
         }
@@ -60,22 +65,29 @@ export default series(clean, parallel(copy, sass), sync)
 export function copy() {
     copyJS()
     copyHtml()
-    return src(paths.app.src, { base: './src', ignore: [`src/sass/**`, paths.html.src, paths.js.src ]})
-    .pipe(dest(paths.app.dest))
-    .pipe(browserSync.stream())
+    return src(paths.app.src, { base: './src', ignore: [`src/sass/**`, paths.html.src, paths.js.src] })
+        .pipe(dest(paths.app.dest))
+        .pipe(browserSync.stream())
 }
 
 function copyHtml() {
     return src(paths.html.src)
-    .pipe(dest(paths.html.dest))
-    .pipe(browserSync.stream({ match: "**/*.html" }))
+        .pipe(dest(paths.html.dest))
+        .pipe(browserSync.stream({ match: "**/*.html" }))
 }
 
 function copyJS() {
     return src(paths.js.src, {base: './src'})
+        // .pipe(eslint())
+        // .pipe(eslint.format())
+        // .pipe(eslint.failAfterError())
+        // .pipe(sourcemaps.init())
+        // .pipe(babel({presets: ['@babel/preset-env']}))
+        // .pipe(concat('bundle.js'))
+        // .pipe(sourcemaps.write('.'))
         .pipe(webpack(require('./webpack.config.js')))
-    .pipe(dest(paths.js.dest))
-    .pipe(browserSync.stream({ match: "**/*.js" }))
+        .pipe(dest(paths.js.dest))
+        .pipe(browserSync.stream({match: "**/*.js"}))
 }
 
 export function sass() {

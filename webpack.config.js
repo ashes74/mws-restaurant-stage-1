@@ -10,7 +10,7 @@ module.exports = {
     },
     output: {
         path: path.join(__dirname , '/dist'),
-        filename: "[name].js"
+        filename: "js/[name].js"
     },
     devtool: "source-map",
     devServer: {
@@ -44,7 +44,7 @@ module.exports = {
         ]
     },
     plugins: [
-        new CleanWebpackPlugin(['dist']),
+        new CleanWebpackPlugin(['dist/js', 'dist/sw.js*']),
         new ServiceWorkerWebpackPlugin({
             entry: path.join(__dirname, 'src/sw.js'),
           }),

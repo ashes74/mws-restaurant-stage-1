@@ -1,6 +1,10 @@
-let restaurant;
-var newMap;
+const DBHelper= require( "./dbhelper");
 
+let restaurants,
+  neighborhoods,
+  cuisines
+var newMap
+var markers = []
 /**
  * Initialize map as soon as the page is loaded.
  */
