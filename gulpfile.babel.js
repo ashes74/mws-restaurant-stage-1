@@ -8,7 +8,6 @@ import jest from 'gulp-jest';
 import del from 'del';
 
 const browserSync = require('browser-sync').create();
-const reload = browserSync.reload;
 const webpack = require('webpack-stream');
 
 // NB: if change file structure can update src and dest quicker as variables
