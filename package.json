@@ -7,7 +7,7 @@
   "author": "Lori-Anne Ashwood <ashes74@users.noreply.github.com>",
   "license": "MIT",
   "scripts": {
-    "start": "python -m SimpleHTTPServer 8000",
+    "start": "gulp",
     "build": "webpack",
     "start:dev": "webpack-dev-server --open"
   },
