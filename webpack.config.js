@@ -11,7 +11,7 @@ module.exports = {
         restaurant: "./src/js/restaurant_info.js"
     },
     output: {
-        path: path.join(__dirname , '/dist'),
+        path: path.join(__dirname, '/dist'),
         filename: "js/[name].js"
     },
     devtool: "source-map",
@@ -48,8 +48,8 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(['dist/js', 'dist/sw.js*']),
         new ServiceWorkerWebpackPlugin({
-            entry: path.join(__dirname, 'src/sw.js'),
-          }),
+            entry: path.join(__dirname, 'src/sw.js')
+        }),
         new webpack.HotModuleReplacementPlugin()
-    ],
+    ]
 }
