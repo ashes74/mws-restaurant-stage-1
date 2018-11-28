@@ -16,9 +16,9 @@ const fetchRestaurantsFromDb = async(id) => {
     
     let tx = db.transaction('restaurants');
     let restaurantStore = tx.objectStore('restaurants');
-    return (id
-        ? restaurantStore.get(id)
-        : restaurantStore.getAll());
+    return await id
+        ? restaurantStore.get(Number(id))
+        : restaurantStore.getAll();
 }
 
 const putRestaurant = async(restaurantFromNetwork) => {

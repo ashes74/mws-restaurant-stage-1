@@ -40,7 +40,9 @@ export default class DBHelper {
         dbPromise.putRestaurants(await response.clone().json())
         return await response.json();
       }
-      return cachedRestaurants;
+      return cachedRestaurants > 0
+        ? cachedRestaurants
+        : console.log("No network or cached data");
     } catch (err) {
       console.error(`Request failed. Returned status of ${err.status}. ${err}`);
       //If error fetching from network return offline stored option
@@ -52,21 +54,26 @@ export default class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static async fetchRestaurantById(id, callback) {
+    const cachedRestaurant = await this.getCachedRestaurants(id);
     try {
       console.log('Requesting from dbhelper')
       const response = await fetch(`${DBHelper.API_URL}/${id}`, {
         method: 'GET',
         mode: 'cors'
       })
-      dbPromise.putRestaurant(await response.clone().json())
-
-      console.log('Responding from dbhelper')
-      callback(null, await response.json());
+      if (response.status === 200) {
+        dbPromise.putRestaurant(await response.clone().json())
+        console.log('Responding from dbhelper')
+        return callback(null, await response.json());
+      }
+      return cachedRestaurant > 0
+        ? callback(response.status, cachedRestaurant)
+        : console.log("No network or cached data");
     } catch (err) {
       console.error(`Restaurant with ${id} does not exist. ${err}`);
       //If error fetching from network return offline stored option
       console.log('Responding from dbhelper')
-      return dbPromise.fetchRestaurantsFromDb(id);
+      return callback(err, cachedRestaurant);
     }
   }
 
