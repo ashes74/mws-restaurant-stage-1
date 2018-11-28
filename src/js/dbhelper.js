@@ -40,7 +40,7 @@ export default class DBHelper {
         dbPromise.putRestaurants(await response.clone().json())
         return await response.json();
       }
-      return cachedRestaurants > 0
+      return cachedRestaurants.length > 0
         ? cachedRestaurants
         : console.log("No network or cached data");
     } catch (err) {
@@ -66,14 +66,16 @@ export default class DBHelper {
         console.log('Responding from dbhelper')
         return callback(null, await response.json());
       }
-      return cachedRestaurant > 0
+      return cachedRestaurant.length > 0
         ? callback(response.status, cachedRestaurant)
         : console.log("No network or cached data");
     } catch (err) {
       console.error(`Restaurant with ${id} does not exist. ${err}`);
       //If error fetching from network return offline stored option
       console.log('Responding from dbhelper')
-      return callback(err, cachedRestaurant);
+      return cachedRestaurant.length > 0
+        ? callback(null, cachedRestaurant)
+        : callback(err, null);
     }
   }
 
