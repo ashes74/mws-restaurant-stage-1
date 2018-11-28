@@ -1,0 +1,9 @@
+{
+  "short_name": "MWS Reviews",
+  "name": "Mobile Web Specialist: Restaurant Reviews",
+
+  "start_url": "/",
+  "background_color": "#3f6d8f",
+  "display": "standalone",
+  "theme_color": "#3f6d8f"
+}
