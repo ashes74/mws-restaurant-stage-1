@@ -1,7 +1,7 @@
 import idb from 'idb';
 
 //create DB
-const dbInit = idb.open('mws-rest-reviews', 1, upgradeDb => {
+const dbInit = idb.open('restaurant-reviews', 1, upgradeDb => {
     //check that it's supported
     if (!window.indexedDB) 
         return console.log(`IndexedDB not supported in this browser`)
@@ -9,11 +9,16 @@ const dbInit = idb.open('mws-rest-reviews', 1, upgradeDb => {
     upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
 })
 
-const fetchAllRestaurantsFromDb = async() => {
+const fetchRestaurantsFromDb = async(id) => {
     let db = await dbInit
+    if (!db) 
+        return console.log('no db exists');
+    
     let tx = db.transaction('restaurants');
     let restaurantStore = tx.objectStore('restaurants');
-    return restaurantStore.getAll();
+    return (id
+        ? restaurantStore.get(id)
+        : restaurantStore.getAll());
 }
 
 const putRestaurant = async(restaurantFromNetwork) => {
@@ -27,8 +32,6 @@ const putRestaurant = async(restaurantFromNetwork) => {
             restaurantStore.add(restaurantFromNetwork)
         }
         await tx.complete;
-        console.log('successful addition to store', restaurantFromNetwork);
-
     } catch (error) {
         console.error('Error adding restaurant to store');
     }
@@ -39,8 +42,9 @@ const putRestaurants = async restaurants => {
 
 }
 const dbPromise = {
-    fetchAllRestaurantsFromDb,
-    putRestaurants
+    fetchRestaurantsFromDb,
+    putRestaurants,
+    putRestaurant
 
 }
 
