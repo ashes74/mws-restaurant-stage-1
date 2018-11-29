@@ -26,7 +26,7 @@ const putRestaurant = async(restaurantFromNetwork) => {
         let db = await dbInit;
         let tx = db.transaction('restaurants', 'readwrite');
         let restaurantStore = tx.objectStore('restaurants')
-        const idbRestaurant = await restaurantStore.get(restaurantFromNetwork.id)
+        const idbRestaurant = await restaurantStore.get(Number(restaurantFromNetwork.id))
         //TODO: check restaurantFromNetwork.updatedAt to see if newer that idbRestaurant
         if (!idbRestaurant) {
             restaurantStore.add(restaurantFromNetwork)
