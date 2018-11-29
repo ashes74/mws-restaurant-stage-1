@@ -7,9 +7,8 @@
   "author": "Lori-Anne Ashwood <ashes74@users.noreply.github.com>",
   "license": "MIT",
   "scripts": {
-    "start": "gulp",
-    "build": "webpack",
-    "start:dev": "webpack-dev-server --open"
+    "start": "yarn blendid",
+    "build": "yarn blendid build"
   },
   "babel": {
     "presets": [
