@@ -32,11 +32,10 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
     const requestUrl = new URL(event.request.url);
-    console.log(`Fetching ${requestUrl}`);
-
-    // if accessing API, default to DB Helper functions
+    // console.log(`Fetching ${requestUrl}`); if accessing API, default to DB Helper
+    // functions
     if (requestUrl.port === '1337' && requestUrl.hostname === 'localhost') 
-        return console.log("Leave it to DBHelper");
+        return //console.log("Leave it to DBHelper");
     
     //for restaurant pages return restaurant skeleton
     if (requestUrl.origin === location.origin) {
