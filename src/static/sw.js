@@ -1,4 +1,4 @@
-const staticCacheName = "mws-rest-reviews-v2"
+const staticCacheName = "mws-rest-reviews-v3"
 const urlsToCache = [
     '/',
     '/js/main.js',
@@ -34,14 +34,14 @@ self.addEventListener('fetch', event => {
     const requestUrl = new URL(event.request.url);
     // console.log(`Fetching ${requestUrl}`); if accessing API, default to DB Helper
     // functions
-    if (requestUrl.port === '1337' && requestUrl.hostname === 'localhost') 
+    if (requestUrl.port === '1337' && requestUrl.hostname === 'localhost')
         return //console.log("Leave it to DBHelper");
-    
+
     //for restaurant pages return restaurant skeleton
     if (requestUrl.origin === location.origin) {
         if (requestUrl.pathname.match(/^\/restaurant*/)) {
             console.log('Returning cached skeleton of restaurant page');
-            return event.respondWith(caches.match('/restaurant.html'));
+            return event.respondWith(caches.match('/restaurant.html')) || fetchFromNetwork(event.request);
         }
     }
     // for all other requests return cached value or fetch from network
@@ -69,6 +69,6 @@ async function fetchFromNetwork(request) {
     } catch (err) {
         // console.error(`Error fetching from network,`, request, err);
         return new Response(`Error fetching from network, `, err);
-        // return caches.match('/offline.html')
+    // return caches.match('/offline.html')
     }
 }
