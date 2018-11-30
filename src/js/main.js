@@ -80,25 +80,31 @@ const fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize leaflet map, called from HTML.
  */
 const initMap = () => {
-  self.newMap = L.map('map', {
-    center: [
-      40.722216, -73.987501
-    ],
-    zoom: 12,
-    scrollWheelZoom: false
-  });
-  L
-    .tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken' +
-      '}', {
-    mapboxToken: 'pk.eyJ1IjoidHN0a3MiLCJhIjoiY2lvM2c2c2g5MDBoZ3Y0a3FmMWo2NGFrZiJ9.fIKUzwIFv3qDd0W2' +
-        'C1fpdA',
-    maxZoom: 18,
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contr' +
-        'ibutors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,' +
-        ' Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-    id: 'mapbox.streets'
-  })
-    .addTo(self.newMap);
+  if (navigator.onLine) {
+    try {
+      self.newMap = L.map('map', {
+        center: [
+          40.722216, -73.987501
+        ],
+        zoom: 12,
+        scrollWheelZoom: false
+      });
+      L
+        .tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken' +
+          '}', {
+        mapboxToken: 'pk.eyJ1IjoidHN0a3MiLCJhIjoiY2lvM2c2c2g5MDBoZ3Y0a3FmMWo2NGFrZiJ9.fIKUzwIFv3qDd0W2' +
+            'C1fpdA',
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contr' +
+            'ibutors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,' +
+            ' Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        id: 'mapbox.streets'
+      })
+        .addTo(self.newMap);
+    } catch (err) {
+      console.log(`Error initializing map ${err}`);
+    }
+  }
   updateRestaurants();
 }
 
@@ -193,6 +199,8 @@ const createRestaurantHTML = (restaurant) => {
  * Add markers for current restaurants to the map.
  */
 const addMarkersToMap = (restaurants = self.restaurants) => {
+  if (!L || !newMap) 
+    return; //if no map exist while offline, exit early
   restaurants.forEach(restaurant => {
     // Add marker to the map
     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.newMap);
