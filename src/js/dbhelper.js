@@ -42,14 +42,13 @@ export default class DBHelper {
         })
         // if everything is ok, cache new data, then return network response
         if (response.ok) {
-          console.log('Network response from dbhelper')
+          // console.log('Network response from dbhelper')
           dbPromise.putRestaurants(await response.clone().json())
           return response.json();
         }
       }
-      console.log('Cached response from dbhelper')
-
-      // if network response is not ok, return cached data
+      // console.log('Cached response from dbhelper') if network response is not ok,
+      // return cached data
       const cachedRestaurants = await this.getCachedRestaurants();
       return cachedRestaurants;
     } catch (err) {
