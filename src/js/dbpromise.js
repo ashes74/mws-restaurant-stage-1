@@ -61,9 +61,7 @@ const fetchReviewsByRestaurantId = async restaurant_id => {
     let tx = db.transaction('reviews');
     let reviewStore = tx.objectStore('reviews');
     let restaurantIndex = reviewStore.index('restaurant_id')
-    return await restaurant_id
-        ? restaurantIndex.get(Number(restaurant_id))
-        : restaurantIndex.getAll();
+    return await restaurantIndex.getAll(Number(restaurant_id));
 }
 
 /**
