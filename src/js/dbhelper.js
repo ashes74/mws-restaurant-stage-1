@@ -224,17 +224,6 @@ export default class DBHelper {
   /////////////////////// REVIEW DB METHODS //////////////////////
 
   /**
-   * Return cached reviews
-   */
-  static async getCachedReviews(id) {
-    try {
-      return await dbPromise.fetchReviewsFromDb(id);
-    } catch (err) {
-      return new Error(`Error getting reviews from database ${err}`)
-    }
-  }
-
-  /**
    * Returns all reviews
    */
   static async fetchReviews() {
@@ -277,15 +266,15 @@ export default class DBHelper {
         //if successful, update cache of reviews
         if (networkResponse.ok) {
           // console.log('Network response from dbhelper')
-          dbPromise.putReviews(await networkResponse.clone().json())
-          return networkResponse.json();
+          // TODO: Put review in cache
+          return await networkResponse.json();
         }
       }
       // else, return reviews from cache
-      return await this.getCachedReviews(restaurant_id)
+      return await dbPromise.fetchReviewsByRestaurantId(restaurant_id)
     // handle errors
     } catch (err) {
-      return await this.getCachedReviews(restaurant_id) || new Response('Reviews not cached for offline use')
+      return await dbPromise.fetchReviewsByRestaurantId(restaurant_id) || console.error(err)
     }
   }
 

@@ -32,14 +32,14 @@ const initMap = () => {
           L
             .tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken' +
               '}', {
-            mapboxToken: 'pk.eyJ1IjoidHN0a3MiLCJhIjoiY2lvM2c2c2g5MDBoZ3Y0a3FmMWo2NGFrZiJ9.fIKUzwIFv3qDd0W2' +
-                'C1fpdA',
-            maxZoom: 18,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contr' +
-                'ibutors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,' +
-                ' Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            id: 'mapbox.streets'
-          })
+                mapboxToken: 'pk.eyJ1IjoidHN0a3MiLCJhIjoiY2lvM2c2c2g5MDBoZ3Y0a3FmMWo2NGFrZiJ9.fIKUzwIFv3qDd0W2' +
+                  'C1fpdA',
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contr' +
+                  'ibutors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,' +
+                  ' Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox.streets'
+              })
             .addTo(self.newMap);
           DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
         } catch (err) {
@@ -99,7 +99,8 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  DBHelper.fetchReviewsByRestaurantId(restaurant.id)
+    .then(fillReviewsHTML);
 }
 
 /**
@@ -153,8 +154,14 @@ const createReviewHTML = (review) => {
   name.innerHTML = review.name;
   li.appendChild(name);
 
+  const dateOptions = {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  };
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.createdAt).toLocaleDateString('en-US', dateOptions);
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -183,14 +190,14 @@ const fillBreadcrumb = (restaurant = self.restaurant) => {
  * Get a parameter by name from page URL.
  */
 const getParameterByName = (name, url) => {
-  if (!url) 
+  if (!url)
     url = window.location.href;
   name = name.replace(/[\[\]]/g, '\\$&');
   const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`),
     results = regex.exec(url);
-  if (!results) 
+  if (!results)
     return null;
-  if (!results[2]) 
+  if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
