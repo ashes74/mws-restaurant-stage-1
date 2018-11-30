@@ -11,7 +11,6 @@ var markers = [];
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
-  console.log('Document loaded registering service worker, fetching neighborhoods and cuisines');
 
   registerServiceWorker();
   initMap(); // added
@@ -154,8 +153,6 @@ const resetRestaurants = (restaurants) => {
  * Create all restaurants HTML and add them to the webpage.
  */
 const fillRestaurantsHTML = (restaurants = self.restaurants) => {
-  console.log('Populating restaurants grid', restaurants);
-
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
