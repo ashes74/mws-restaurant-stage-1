@@ -11,11 +11,28 @@ export default class DBHelper {
    */
   static get API_URL() {
     const port = 1337 // Change this to your server port
-    return `http://localhost:${port}/restaurants`;
+    return `http://localhost:${port}`;
   }
 
   /**
-   * Return cached messages
+   * Restaurant DB URL
+   */
+  static get RESTAURANT_API_URL() {
+    return `${DBHelper.API_URL}/restaurants`;
+  }
+
+  /**
+   * Reviews DB URL
+   */
+  static get REVIEWS_API_URL() {
+    return `${DBHelper.API_URL}/reviews`;
+  }
+
+
+  /////////////////////// RESTAURANT DB METHODS //////////////////////
+
+  /**
+   * Return cached restaurants
    */
   static async getCachedRestaurants(id) {
     try {
@@ -36,7 +53,7 @@ export default class DBHelper {
   static async fetchRestaurants() {
     try {
       if (navigator.onLine) {
-        const response = await fetch(DBHelper.API_URL, {
+        const response = await fetch(DBHelper.RESTAURANT_API_URL, {
           method: 'GET',
           mode: 'cors'
         })
@@ -64,7 +81,7 @@ export default class DBHelper {
   static async fetchRestaurantById(id, callback) {
     try {
       if (navigator.onLine) {
-        const response = await fetch(`${DBHelper.API_URL}/${id}`, {
+        const response = await fetch(`${DBHelper.RESTAURANT_API_URL}/${id}`, {
           method: 'GET',
           mode: 'cors'
         })
@@ -182,9 +199,7 @@ export default class DBHelper {
   /**
    * Restaurant image URL.
    */
-  static imageUrlForRestaurant({
-    photograph = 'notfound'
-  }) {
+  static imageUrlForRestaurant({photograph = 'notfound'}) {
     return (`/img/${photograph}.jpg`);
   }
 
@@ -203,4 +218,79 @@ export default class DBHelper {
     marker.addTo(map);
     return marker;
   }
+
+  /////////////////////// END OF RESTAURANT DB METHODS //////////////////////
+
+  /////////////////////// REVIEW DB METHODS //////////////////////
+
+  /**
+   * Return cached reviews
+   */
+  static async getCachedReviews(id) {
+    try {
+      return await dbPromise.fetchReviewsFromDb(id);
+    } catch (err) {
+      return new Error(`Error getting reviews from database ${err}`)
+    }
+  }
+
+  /**
+   * Returns all reviews
+   */
+  static async fetchReviews() {
+    // if online fetch reviews from network
+    try {
+      if (navigator.onLine) {
+        const networkResponse = await fetch(DBHelper.REVIEWS_API_URL, {
+          method: 'GET',
+          mode: 'cors'
+        })
+        //if successful, update cache of reviews
+        if (networkResponse.ok) {
+          // console.log('Network response from dbhelper')
+          dbPromise.putReviews(await networkResponse.clone().json())
+          return networkResponse.json();
+        }
+      }
+      // else, return reviews from cache
+      return await this.getCachedReviews()
+    // handle errors
+    } catch (err) {
+      return await this.getCachedReviews() || new Response('Reviews not cached for offline use')
+    }
+
+  }
+
+
+  /**
+   * Returns review for restaurant by id 
+   * @param restaurant_id : id of restaurant
+   */
+  static async fetchReviewsByRestaurantId(restaurant_id) {
+    // if online fetch reviews from network
+    try {
+      if (navigator.onLine) {
+        const networkResponse = await fetch(`${DBHelper.REVIEWS_API_URL}?restaurant_id=${restaurant_id}`, {
+          method: 'GET',
+          mode: 'cors'
+        })
+        //if successful, update cache of reviews
+        if (networkResponse.ok) {
+          // console.log('Network response from dbhelper')
+          dbPromise.putReviews(await networkResponse.clone().json())
+          return networkResponse.json();
+        }
+      }
+      // else, return reviews from cache
+      return await this.getCachedReviews(restaurant_id)
+    // handle errors
+    } catch (err) {
+      return await this.getCachedReviews(restaurant_id) || new Response('Reviews not cached for offline use')
+    }
+  }
+
+  /////////////////////// END OF REVIEW DB METHODS //////////////////////
+
+
+
 }
