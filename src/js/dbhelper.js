@@ -266,7 +266,7 @@ export default class DBHelper {
         //if successful, update cache of reviews
         if (networkResponse.ok) {
           // console.log('Network response from dbhelper')
-          // TODO: Put review in cache
+          dbPromise.putReviews(await networkResponse.clone().json())
           return await networkResponse.json();
         }
       }
