@@ -1,0 +1,16 @@
+button.fav {
+  background: none;
+  border: none;
+  color: white;
+  padding: none;
+  margin: none;
+
+  &[aria-pressed='true'] {
+    color: yellow;
+  }
+
+  &:hover,
+  &:focus {
+    border: orange;
+  }
+}

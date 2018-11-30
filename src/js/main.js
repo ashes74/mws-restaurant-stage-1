@@ -1,5 +1,6 @@
 import DBHelper from './dbhelper';
 import { registerServiceWorker } from '../register';
+import favoriteButton from "./components/favorite-button";
 
 let restaurants,
   neighborhoods,
@@ -188,6 +189,9 @@ const createRestaurantHTML = (restaurant) => {
   more.innerHTML = 'View Details';
   more.onclick = () => window.location = DBHelper.urlForRestaurant(restaurant);
   li.append(more)
+
+  const favButton = favoriteButton(restaurant);
+  li.append(favButton);
 
   return li
 }
