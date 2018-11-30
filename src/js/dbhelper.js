@@ -35,20 +35,22 @@ export default class DBHelper {
    */
   static async fetchRestaurants() {
     try {
-      const cachedRestaurants = await this.getCachedRestaurants();
-      const response = await fetch(DBHelper.API_URL, {
-        method: 'GET',
-        mode: 'cors'
-      })
-      // if everything is ok, cache new data, then return network response
-      if (response.ok) {
-        console.log('Network response from dbhelper')
-        dbPromise.putRestaurants(await response.clone().json())
-        return response.json();
+      if (navigator.onLine) {
+        const response = await fetch(DBHelper.API_URL, {
+          method: 'GET',
+          mode: 'cors'
+        })
+        // if everything is ok, cache new data, then return network response
+        if (response.ok) {
+          console.log('Network response from dbhelper')
+          dbPromise.putRestaurants(await response.clone().json())
+          return response.json();
+        }
       }
       console.log('Cached response from dbhelper')
 
       // if network response is not ok, return cached data
+      const cachedRestaurants = await this.getCachedRestaurants();
       return cachedRestaurants;
     } catch (err) {
       console.error(`DB Request failed. Returned status of ${err.status}. ${err}`);
@@ -62,14 +64,16 @@ export default class DBHelper {
    */
   static async fetchRestaurantById(id, callback) {
     try {
-      const response = await fetch(`${DBHelper.API_URL}/${id}`, {
-        method: 'GET',
-        mode: 'cors'
-      })
-      if (response.ok) {
-        dbPromise.putRestaurant(await response.clone().json())
-        console.log('Network response from dbhelper')
-        return callback(null, await response.json());
+      if (navigator.onLine) {
+        const response = await fetch(`${DBHelper.API_URL}/${id}`, {
+          method: 'GET',
+          mode: 'cors'
+        })
+        if (response.ok) {
+          dbPromise.putRestaurant(await response.clone().json())
+          console.log('Network response from dbhelper')
+          return callback(null, await response.json());
+        }
       }
       console.log('Cached response from dbhelper')
 
