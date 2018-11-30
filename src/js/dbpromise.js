@@ -31,19 +31,20 @@ const fetchRestaurantsFromDb = async(id) => {
         : restaurantStore.getAll();
 }
 
-const putRestaurant = async(restaurantFromNetwork) => {
+const putRestaurant = async(networkRestaurant, forceUpdate = false) => {
     try {
         let db = await dbInit;
         let tx = db.transaction('restaurants', 'readwrite');
         let restaurantStore = tx.objectStore('restaurants')
-        const idbRestaurant = await restaurantStore.get(Number(restaurantFromNetwork.id))
-        //TODO: check restaurantFromNetwork.updatedAt to see if newer that idbRestaurant
-        if (!idbRestaurant) {
-            restaurantStore.add(restaurantFromNetwork)
+        const idbRestaurant = await restaurantStore.get(Number(networkRestaurant.id))
+        // if forced update or restaurante doesnt yet exist in db or it's newer put in db
+        if (forceUpdate || !idbRestaurant || new Date(networkRestaurant.updatedAt) > new Date(idbRestaurant.updatedAt)) {
+            // console.log(`Putting ${networkRestaurant} in db. Forced:${forceUpdate}`)
+            restaurantStore.put(networkRestaurant)
         }
         await tx.complete;
     } catch (error) {
-        console.error('Error adding restaurant to store');
+        console.error('Error adding restaurant to store', error);
     }
 }
 
@@ -74,7 +75,7 @@ const putReviews = async (reviews) => {
     const reviewStore = db.transaction('reviews', 'readwrite').objectStore('reviews');
     Promise.all(reviews.map(async networkReview => {
         const idbReview = await reviewStore.get(Number(networkReview.id))
-        if (!idbReview || networkReview.updatedAt > idbReview.updatedAt) {
+        if (!idbReview || new Date(networkReview.updatedAt) > new Date(idbReview.updatedAt)) {
             reviewStore.add(networkReview)
         }
         await reviewStore.complete;
