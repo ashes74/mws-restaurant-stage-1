@@ -30,7 +30,7 @@ self.addEventListener('activate', event => {
     }).catch(err => console.error(`Error removing redundant caches while activating service worker ${err}`)))
 })
 
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', async event => {
     const requestUrl = new URL(event.request.url);
     // console.log(`Fetching ${requestUrl}`); if accessing API, default to DB Helper
     // functions
@@ -41,7 +41,8 @@ self.addEventListener('fetch', event => {
     if (requestUrl.origin === location.origin) {
         if (requestUrl.pathname.match(/^\/restaurant*/)) {
             console.log('Returning cached skeleton of restaurant page');
-            return event.respondWith(caches.match('/restaurant.html')) || fetchFromNetwork(event.request);
+            const cachedResponse = await event.respondWith(caches.match('/restaurant.html'))
+            return cachedResponse || fetchFromNetwork(event.request);
         }
     }
     // for all other requests return cached value or fetch from network
