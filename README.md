@@ -4,10 +4,13 @@
 
 #### Getting started
 
-1. Run the server from stage 2
-2. Run yarn start
+Requirements: Node, Yarn / NPM
 
----
+1. Run the server from stage 2 on port 1337
+2. Install app (`yarn install` or `npm install`)
+3. Run `yarn start` to serve app on `localhost:3000`
+
+## Manifest and icons generated here: https://app-manifest.firebaseapp.com/
 
 #### _Three Stage Course Material Project - Restaurant Reviews_
 
