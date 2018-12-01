@@ -15,33 +15,24 @@ export default function favButton(restaurant) {
     button.onclick = toggleFavorite;
     return button;
 
-    // `
-    // <button class='fav' 
-    // data-id=${restaurant.id} 
-    // aria-label="Mark ${restaurant.name} as favorite" 
-    // aria-pressed=${restaurant.is_favorite}
-    // onclick = ${toggleFavorite}
-    // >★</button>
-    // `
+// `
+// <button class='fav' 
+// data-id=${restaurant.id} 
+// aria-label="Mark ${restaurant.name} as favorite" 
+// aria-pressed=${restaurant.is_favorite}
+// onclick = ${toggleFavorite}
+// >★</button>
+// `
 }
 
 async function toggleFavorite() {
     console.log(this)
     const restaurantId = this.dataset.id;
     const fav = this.getAttribute('aria-pressed') == 'true'; //coerce string bool to real bool
-    const url = `${DBHelper.RESTAURANT_API_URL}/${restaurantId}/?is_favorite=${!fav}`
-    try {
-        const response = await fetch(url, {
-            method: 'PUT'
-        });
-        if (response.ok) {
-            // update restaurant on idb
-            dbPromise.putRestaurant(await response.json())
-            //update button state
-            this.setAttribute('aria-pressed', !fav);
-        }
-    } catch (error) {
-        console.error(`Couldn't mark favorite ${error}`);
 
-    }
+    const {isFavorite, error} = await DBHelper.putFavorite(restaurantId, !fav);
+
+    //update button state if no error 
+    return error ? console.log(error) : this.setAttribute('aria-pressed', isFavorite);
+
 }

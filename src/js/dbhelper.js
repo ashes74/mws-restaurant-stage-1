@@ -284,7 +284,7 @@ export default class DBHelper {
    */
   static async postReview(reviewToSend) {
     try {
-      if( (navigator.onLine) ) {
+      if (navigator.onLine) {
         const url = DBHelper.REVIEWS_API_URL;
         const requestHeaders = {
           method: 'POST',
@@ -296,10 +296,6 @@ export default class DBHelper {
             error,
             msg: `Unable to post review to server, network issue ${networkResponse.status}`
         }
-        console.log({
-          networkResponse
-        })
-
         const reviewToCache = await networkResponse.json()
         dbPromise.putReviews(reviewToCache)
         return reviewToCache;
@@ -315,6 +311,42 @@ export default class DBHelper {
 
   /////////////////////// END OF REVIEW DB METHODS //////////////////////
 
+  /////////////////////// FAVORITE DB METHODS //////////////////////
+
+  static async putFavorite(restaurantId, isFavorite) {
+    console.log(`Storing isFavorite as ${isFavorite} for restaurant ${restaurantId}`);
+
+    try {
+      if (navigator.onLine) {
+        const url = `${DBHelper.RESTAURANT_API_URL}/${restaurantId}/?is_favorite=${isFavorite}`
+        const requestHeaders = {
+          method: 'PUT'
+        }
+
+        const networkResponse = await fetch(url, requestHeaders)
+        if (networkResponse.ok) {
+          // if put successful update restaurant on idb
+          dbPromise.putRestaurant(await networkResponse.clone().json())
+          return {
+            response: await networkResponse.json(),
+            isFavorite,
+            error: ''
+          }
+        } else {
+          //return error 
+          return {
+            error: `Error posting favorite action to network. Status: ${networkResponse.status}`
+          }
+        }
+      }
+
+    } catch (error) {
+      return {
+        msg: 'Error storing favorite action',
+        error
+      }
+    }
+  }
 
 
 }
