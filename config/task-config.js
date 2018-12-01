@@ -21,8 +21,8 @@ module.exports = {
   },
 
   html: {
-    alternateTask: function (gulp, PATH_CONFIG, TASK_CONFIG) {
-      return function () {
+    alternateTask: function(gulp, PATH_CONFIG, TASK_CONFIG) {
+      return function() {
         return gulp
           .src('./src/*.html')
           .pipe(gulp.dest('./dist/'))
