@@ -14,6 +14,15 @@ export default function favButton(restaurant) {
     //handle interaction
     button.onclick = toggleFavorite;
     return button;
+
+    // `
+    // <button class='fav' 
+    // data-id=${restaurant.id} 
+    // aria-label="Mark ${restaurant.name} as favorite" 
+    // aria-pressed=${restaurant.is_favorite}
+    // onclick = ${toggleFavorite}
+    // >★</button>
+    // `
 }
 
 async function toggleFavorite() {

@@ -173,6 +173,8 @@ const createRestaurantHTML = (restaurant) => {
   image.alt = "" // thumbnail on link does not need an alt text
   li.append(image);
 
+  li.append(favoriteButton(restaurant))
+
   const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   li.append(name);
@@ -190,8 +192,6 @@ const createRestaurantHTML = (restaurant) => {
   more.onclick = () => window.location = DBHelper.urlForRestaurant(restaurant);
   li.append(more)
 
-  const favButton = favoriteButton(restaurant);
-  li.append(favButton);
 
   return li
 }

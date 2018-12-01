@@ -1,9 +1,10 @@
-button.fav {
+button.fav, #restaurants-list li button.fav{
   background: none;
   border: none;
-  color: white;
-  padding: none;
-  margin: none;
+  color: grey;
+  padding: 1%;
+  margin: 0;
+  font-size: 3em;
 
   &[aria-pressed='true'] {
     color: yellow;
@@ -13,4 +14,11 @@ button.fav {
   &:focus {
     border: orange;
   }
+}
+
+#fav-button-container{
+ width: 100%;
+  padding: 0;
+  margin: 0;
+  text-align: center;
 }
