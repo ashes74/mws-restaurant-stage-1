@@ -78,7 +78,7 @@ const handleSubmit = async (e) => {
     console.log(validReview);
 
     //if valid send to Database and cache 
-    const storedReview = await sendFormAndCache(validReview)
+    const storedReview = await DBHelper.postReview(validReview)
     console.log(storedReview)
     //Add to page
     if (!storedReview.error) {
@@ -88,7 +88,7 @@ const handleSubmit = async (e) => {
         clearForm()
     }
     else
-        document.querySelector('#error').innerText = storedReview.error
+        document.querySelector('#error').innerText = storedReview.msg
 }
 
 /**
@@ -101,40 +101,6 @@ function clearForm() {
     form.elements.rating.value = '--'; //because select does not automatically get reset
 }
 
-/**
- * Caches valid form data
- * @returns {object} data that was cached 
- */
-async function cacheForm(reviewToCache) {
-    console.log({
-        reviewToCache
-    })
-    //update cache with new review
-    dbPromise.putReviews(reviewToCache)
-    return reviewToCache;
-}
-
-/**
- * Sends form to network and caches good responses
- * @param {object} reviewToSend 
- * @returns {object} saved review or error 
- */
-async function sendFormAndCache(reviewToSend) {
-    const url = DBHelper.REVIEWS_API_URL;
-    const requestHeaders = {
-        method: 'POST',
-        body: JSON.stringify(reviewToSend)
-    }
-
-    const dbResponse = await fetch(url, requestHeaders);
-    if (!dbResponse.ok) return {
-            error: 'Unable to post review to server'
-    }
-    console.log({
-        dbResponse
-    })
-    return cacheForm(await dbResponse.json())
-}
 
 /**
  * Validates form and 

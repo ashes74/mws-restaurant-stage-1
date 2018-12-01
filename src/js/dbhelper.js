@@ -21,13 +21,6 @@ export default class DBHelper {
     return `${DBHelper.API_URL}/restaurants`;
   }
 
-  /**
-   * Reviews DB URL
-   */
-  static get REVIEWS_API_URL() {
-    return `${DBHelper.API_URL}/reviews`;
-  }
-
 
   /////////////////////// RESTAURANT DB METHODS //////////////////////
 
@@ -221,6 +214,13 @@ export default class DBHelper {
 
   /////////////////////// END OF RESTAURANT DB METHODS //////////////////////
 
+  /**
+   * Reviews DB URL
+   */
+  static get REVIEWS_API_URL() {
+    return `${DBHelper.API_URL}/reviews`;
+  }
+
   /////////////////////// REVIEW DB METHODS //////////////////////
 
   /**
@@ -275,6 +275,41 @@ export default class DBHelper {
     // handle errors
     } catch (err) {
       return await dbPromise.fetchReviewsByRestaurantId(restaurant_id) || console.error(err)
+    }
+  }
+
+  /**
+   * @param {object} reviewToSend
+   * @returns {object} review that has been cached or error
+   */
+  static async postReview(reviewToSend) {
+    try {
+      if( (navigator.onLine) ) {
+        const url = DBHelper.REVIEWS_API_URL;
+        const requestHeaders = {
+          method: 'POST',
+          body: JSON.stringify(reviewToSend)
+        }
+
+        const networkResponse = await fetch(url, requestHeaders);
+        if (!networkResponse.ok) return {
+            error,
+            msg: `Unable to post review to server, network issue ${networkResponse.status}`
+        }
+        console.log({
+          networkResponse
+        })
+
+        const reviewToCache = await networkResponse.json()
+        dbPromise.putReviews(reviewToCache)
+        return reviewToCache;
+      }
+    } catch (error) {
+      console.log(error)
+      return {
+        msg: `Unable to post review to server. Please try again later`,
+        error
+      }
     }
   }
 
