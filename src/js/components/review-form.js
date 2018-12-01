@@ -80,9 +80,8 @@ const handleSubmit = (e) => {
 
     console.log(validReview);
 
-    //if valid cache 
-    cacheForm(validReview)
-    //Send to Database 
+    //if valid send to Database and cache 
+    sendFormAndCache(validReview)
 
     //Add to page
 
@@ -98,14 +97,34 @@ function clearForm() {
     const form = document.querySelector('#review-form');
     form.reset();
     form.elements.rating.value = '--'; //because select does not automatically get reset
-
 }
 
 /**
  * Caches valid form data
  */
-function cacheForm(data) {
+async function cacheForm(reviewToCache) {
+    console.log({
+        reviewToCache
+    })
+}
 
+/**
+ * Sends form to network and caches good responses
+ * @param {object} reviewToSend 
+ */
+async function sendFormAndCache(reviewToSend) {
+    const url = DBHelper.REVIEWS_API_URL;
+    const requestHeaders = {
+        method: 'POST',
+        body: JSON.stringify(reviewToSend)
+    }
+
+    const dbResponse = await fetch(url, requestHeaders);
+    if (!dbResponse.ok) return 'Unable to post review to server'
+    console.log({
+        dbResponse
+    })
+    cacheForm(await dbResponse.json())
 }
 
 /**
