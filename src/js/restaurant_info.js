@@ -1,5 +1,6 @@
 import DBHelper from './dbhelper';
 import favoriteButton from "./components/favorite-button";
+import reviewForm from "./components/review-form";
 
 let restaurants,
   neighborhoods,
@@ -147,12 +148,18 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     ul.appendChild(createReviewHTML(review));
   });
   container.appendChild(ul);
+
+  const formDiv = document.createElement('div');
+  const id = getParameterByName('id');
+  formDiv.innerHTML = "<h3> Speak your truth </h3>" + reviewForm(id)
+ 
+  container.appendChild(formDiv)
 }
 
 /**
  * Create review HTML and add it to the webpage.
  */
-const createReviewHTML = (review) => {
+ const createReviewHTML = (review) => {
   const li = document.createElement('li');
   const name = document.createElement('p');
   name.innerHTML = review.name;
