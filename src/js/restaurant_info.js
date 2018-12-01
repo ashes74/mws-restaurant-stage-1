@@ -151,15 +151,16 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 
   const formDiv = document.createElement('div');
   const id = getParameterByName('id');
-  formDiv.innerHTML = "<h3> Speak your truth </h3>" + reviewForm(id)
- 
+  formDiv.innerHTML = "<h3> Speak your truth </h3>"
+  formDiv.append(reviewForm(id))
+
   container.appendChild(formDiv)
 }
 
 /**
  * Create review HTML and add it to the webpage.
  */
- const createReviewHTML = (review) => {
+const createReviewHTML = (review) => {
   const li = document.createElement('li');
   const name = document.createElement('p');
   name.innerHTML = review.name;
