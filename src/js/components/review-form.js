@@ -68,11 +68,8 @@ export default function reviewForm(restaurantId) {
     return form
 }
 
-const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
     console.log('Submitting form', e);
-
-
-
     e.preventDefault();
     //validate data
     const validReview = getValidFormData();
@@ -81,12 +78,17 @@ const handleSubmit = (e) => {
     console.log(validReview);
 
     //if valid send to Database and cache 
-    sendFormAndCache(validReview)
-
+    const storedReview = await sendFormAndCache(validReview)
+    console.log(storedReview)
     //Add to page
-
-    //clear form 
-    clearForm()
+    if (!storedReview.error) {
+        const reviewItemHtml = createReviewHTML(storedReview);
+        document.querySelector('#reviews-list').appendChild(reviewItemHtml);
+        //clear form 
+        clearForm()
+    }
+    else
+        document.querySelector('#error').innerText = storedReview.error
 }
 
 /**
@@ -101,16 +103,21 @@ function clearForm() {
 
 /**
  * Caches valid form data
+ * @returns {object} data that was cached 
  */
 async function cacheForm(reviewToCache) {
     console.log({
         reviewToCache
     })
+    //update cache with new review
+    dbPromise.putReviews(reviewToCache)
+    return reviewToCache;
 }
 
 /**
  * Sends form to network and caches good responses
  * @param {object} reviewToSend 
+ * @returns {object} saved review or error 
  */
 async function sendFormAndCache(reviewToSend) {
     const url = DBHelper.REVIEWS_API_URL;
@@ -120,11 +127,13 @@ async function sendFormAndCache(reviewToSend) {
     }
 
     const dbResponse = await fetch(url, requestHeaders);
-    if (!dbResponse.ok) return 'Unable to post review to server'
+    if (!dbResponse.ok) return {
+            error: 'Unable to post review to server'
+    }
     console.log({
         dbResponse
     })
-    cacheForm(await dbResponse.json())
+    return cacheForm(await dbResponse.json())
 }
 
 /**
@@ -134,7 +143,7 @@ async function sendFormAndCache(reviewToSend) {
 function getValidFormData() {
     console.log('Validating form');
     const form = document.querySelector('#review-form');
-    const error = document.getElementById('error');
+    const error = document.querySelector('#error');
     console.log(form.elements)
     //get form elements 
     const {name, rating, comments} = form.elements;
