@@ -1,0 +1,26 @@
+#review-form {
+  width: 30vw;
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+    border-radius: 0;
+    margin: 0;
+    box-sizing: border-box;
+
+    // &:invalid {
+    //   box-shadow: 0 0 5px 1px red;
+    // }
+
+    &:valid {
+      border: 1px solid black;
+    }
+  }
+
+  option {
+    [value='--'][disabled] {
+      display: none;
+    }
+  }
+}
