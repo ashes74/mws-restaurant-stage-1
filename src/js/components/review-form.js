@@ -68,37 +68,6 @@ export default function reviewForm(restaurantId) {
     return form
 }
 
-// String literal format is cool and easy to parse. But bundles weird.
-// TO DO: Look into bundling better
-// const form = `
-//     <form id="review-form" data-restaurantId=${restaurantId} onsubmit ="${handleSubmit}">
-//         <p> <input id ="name" type="text" aria-label="Name" placeholder="Enter Your Name" required/></p>
-//         <p>
-//             <label for="rating" >Your rating: </label>
-//             <select id="rating" name="rating" class="rating" required>
-//                 <option value="--">--</option>
-//                 <option value="1">1</option>
-//                 option value="2">2</option>
-//                 <option value="3">3</option>
-//                 <option value="4">4</option>
-//                 <option value="5">5</option>
-//             </select>
-//         </p>
-//         <p>
-//             <textarea id="comments" 
-//             aria-label="comments" 
-//             placeholder="Enter any comments here" rows="10" required>
-//             </textarea>
-//         </p>
-//         <p>
-//             <button type="submit" aria-label="Add Review" class="add-review">
-//             <span>Leave your impressions</span>
-//             </button>
-//         </p>
-
-//     </form>
-// `
-
 const handleSubmit = (e) => {
     console.log('Submitting form', e);
 
@@ -106,8 +75,10 @@ const handleSubmit = (e) => {
 
     e.preventDefault();
     //validate data
+    const validReview = getValidFormData();
+    if (!validReview) return;
 
-    //if valid cache 
+    console.log(validReview);
 
     //Send to Database 
 
@@ -126,8 +97,39 @@ function clearForm(){
 /**
  * Validate form
  */
-function validateForm(){
+function cacheForm(data) {
 
+}
+
+/**
+ * Validates form and 
+ * @returns {object} valid review object
+ */
+function getValidFormData() {
+    console.log('Validating form');
+    const form = document.querySelector('#review-form');
+    console.log(form.elements)
+    //get form elements 
+    const {name, rating, comments} = form.elements;
+    //reject empty rating, other invalid entries handled by browser
+    if (!Number(rating.value)) {
+        console.log('invalid rating', rating.value)
+        rating.invalid = true;
+        rating.focus();
+        return
+    }
+
+    error.innerText = ''
+    // create valid data object
+    const validData = {
+        name: name.value,
+        rating: Number(rating.value),
+        comments: comments.value,
+        restaurantId: Number(form.dataset.restaurantId),
+        createdAt: new Date().toISOString()
+    }
+
+    return validData
 }
 
 /** From the original restaurant_info code 
