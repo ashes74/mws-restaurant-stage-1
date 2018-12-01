@@ -80,22 +80,29 @@ const handleSubmit = (e) => {
 
     console.log(validReview);
 
+    //if valid cache 
+    cacheForm(validReview)
     //Send to Database 
 
     //Add to page
 
     //clear form 
+    clearForm()
 }
 
 /**
  * Clear form 
  */
-function clearForm(){
+function clearForm() {
+    console.log('Clearing form');
+    const form = document.querySelector('#review-form');
+    form.reset();
+    form.elements.rating.value = '--'; //because select does not automatically get reset
 
 }
 
 /**
- * Validate form
+ * Caches valid form data
  */
 function cacheForm(data) {
 
@@ -108,6 +115,7 @@ function cacheForm(data) {
 function getValidFormData() {
     console.log('Validating form');
     const form = document.querySelector('#review-form');
+    const error = document.getElementById('error');
     console.log(form.elements)
     //get form elements 
     const {name, rating, comments} = form.elements;
@@ -116,6 +124,7 @@ function getValidFormData() {
         console.log('invalid rating', rating.value)
         rating.invalid = true;
         rating.focus();
+        error.innerText = "Please add a rating"
         return
     }
 
@@ -140,24 +149,24 @@ const createReviewHTML = (review) => {
     const name = document.createElement('p');
     name.innerHTML = review.name;
     li.appendChild(name);
-  
+
     const dateOptions = {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
     };
     const date = document.createElement('p');
     date.innerHTML = new Date(review.createdAt).toLocaleDateString('en-US', dateOptions);
     li.appendChild(date);
-  
+
     const rating = document.createElement('p');
     rating.innerHTML = `Rating: ${review.rating}`;
     li.appendChild(rating);
-  
+
     const comments = document.createElement('p');
     comments.innerHTML = review.comments;
     li.appendChild(comments);
-  
+
     return li;
-  }
+}
