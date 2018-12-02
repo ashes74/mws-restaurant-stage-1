@@ -1,7 +1,10 @@
 import dbPromise from './js/dbpromise';
 import DBHelper from './js/dbhelper';
 
-const staticCacheName = "mws-rest-reviews-v3"
+const version = 'v4'
+const staticCacheName = `mws-rest-reviews-${version}`
+// const contentImagesCache = `mws-rest-reviews-images-${version}`
+
 const urlsToCache = [
     '/',
     '/main.js',
@@ -10,11 +13,6 @@ const urlsToCache = [
     '/404.html',
     '/offline.html',
     '/restaurant.html',
-    '/img/notfound.jpg',
-    '/img/favicon.png',
-    '/img/offline.jpg',
-    'img/icons/icon-192x192.png',
-    'img/icons/icon-512x512.png'
 ]
 
 self.addEventListener('install', event => {
@@ -30,7 +28,8 @@ self.addEventListener('activate', event => {
     // On activation, remove redundant caches to conserve on space
     event.waitUntil(caches.keys().then(cacheNames => {
         return Promise.all(cacheNames.filter(cacheName => {
-            return cacheName.startsWith('mws-rest-reviews-') && cacheName !== staticCacheName;
+            return cacheName.startsWith('mws-rest-reviews-') &&
+                cacheName !== staticCacheName
         }).map(cacheName => caches.delete(cacheName)))
     }).catch(err => console.error(`Error removing redundant caches while activating service worker ${err}`)))
 })
@@ -42,10 +41,14 @@ self.addEventListener('fetch', async event => {
     if (requestUrl.port === '1337' && requestUrl.hostname === 'localhost')
         return //console.log("Leave it to DBHelper");
 
-    if (requestUrl.pathname.startsWith('/restaurant.html')) {
+    if (requestUrl.pathname.startsWith('/restaurant.html?id')) {
         //for restaurant pages return restaurant skeleton
         event.respondWith(caches.match('/restaurant.html'));
         return;
+    }
+    // //handle responsive images 
+    if (requestUrl.pathname.startsWith('/img/')) {
+        return event.respondWith(serveImages(event.request));
     }
 
     // for all other requests return cached value or fetch from network
@@ -80,6 +83,29 @@ async function fetchFromNetwork(request) {
         return caches.match('/offline.html')
     }
 }
+
+//from Alexandro Perez
+async function serveImages(request) {
+    try {
+        let imageCacheUrl = request.url;
+
+        // Make a new URL with a stripped suffix and extension from the request url
+        // i.e. /img/1-medium.jpg  will become  /img/1
+        // we'll use this as the KEY for storing image into cache
+        imageCacheUrl = imageCacheUrl.replace(/-small\.\w{3}|-medium\.\w{3}|-large\.\w{3}/i, '');
+
+        const cache = await caches.open(staticCacheName)
+        const response = await cache.match(imageCacheUrl)
+        // if image is in cache, return it, else fetch from network, cache a clone, then return network response
+        return response || fetch(request).then(function(networkResponse) {
+                cache.put(imageCacheUrl, networkResponse.clone());
+                return networkResponse;
+            });
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 
 self.addEventListener('sync', async event => {
     console.log('Sync event triggered for ', event.tag)

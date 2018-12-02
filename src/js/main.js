@@ -164,6 +164,8 @@ const createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.srcset = DBHelper.imageSrcsetForRestaurant(restaurant);
+  image.sizes = DBHelper.imageSizesForRestaurant();
   image.alt = "" // thumbnail on link does not need an alt text
   li.append(image);
 

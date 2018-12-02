@@ -193,7 +193,29 @@ export default class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant({photograph = 'notfound'}) {
-    return (`/img/${photograph}.jpg`);
+    return (`/img/${photograph}-small.jpg`);
+  }
+
+  //From Alejandro Perez
+  /**
+   * Restaurant srcset attribute for browser to decide best resolution. It uses restaurant.photograph
+   * and fallbacks to restaurant.id if former is missing.
+   */
+  static imageSrcsetForRestaurant({photograph, id}) {
+    const imageSrc = `/img/${photograph ||id}`;
+    return `${imageSrc}-small.jpg 200w,
+            ${imageSrc}-medium.jpg 400w,
+            ${imageSrc}-large.jpg 600w`;
+  }
+  //From Alejandro Perez
+  /**
+   * Restaurant sizes attribute so browser knows image sizes before deciding
+   * what image to download.
+   */
+  static imageSizesForRestaurant() {
+    return `(max-width: 360px) 280px,
+            (max-width: 600px) 600px,
+            400px`;
   }
 
   /**
