@@ -42,6 +42,12 @@ self.addEventListener('fetch', async event => {
     if (requestUrl.port === '1337' && requestUrl.hostname === 'localhost')
         return //console.log("Leave it to DBHelper");
 
+    if (requestUrl.pathname.startsWith('/restaurant.html')) {
+        //for restaurant pages return restaurant skeleton
+        event.respondWith(caches.match('/restaurant.html'));
+        return;
+    }
+
     // for all other requests return cached value or fetch from network
     event.respondWith(caches.match(event.request).then(cachedResponse => {
         return cachedResponse || fetchFromNetwork(event.request);
@@ -59,19 +65,19 @@ async function fetchFromNetwork(request) {
         }
         if (new URL(request.url).origin === location.origin) {
             if (request.method === 'GET' && networkResponse.ok) {
-                if (requestUrl.pathname.match(/^\/restaurant*.html\/*/)) {
-                    //for restaurant pages return restaurant skeleton
-                    return caches.match('/restaurant.html')
-                }
+
+                console.log('Caching request for', request.url)
                 const cache = await caches.open(staticCacheName)
                 cache.put(request, networkResponse.clone());
             }
         }
         return networkResponse || caches.match('/offline.html');
     } catch (err) {
-        // console.error(`Error fetching from network,`, request, err);
-        return new Response(`Error fetching from network, `, err);
-    // return caches.match('/offline.html')
+        if (new URL(request.url).pathname.startsWith('/browser-sync/'))
+            return new Response() //silence polling errors while offline 
+        console.error(`Error fetching from network,`, request, err);
+        // return new Response(`Error fetching from network, `, err);
+        return caches.match('/offline.html')
     }
 }
 

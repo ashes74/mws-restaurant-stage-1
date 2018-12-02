@@ -183,12 +183,13 @@ const addFavoritesToOutbox = async(favoriteObj) => {
     }
 }
 
-const getFavoritesFromOutbox = async() => {
+const getFavoritesFromOutbox = async(restaurant_id) => {
     try {
         console.log(`Retrieving favorites from outbox`)
         const db = await dbInit;
         const offlineFavStore = db.transaction('offline-favorites').objectStore('offline-favorites');
-        return await offlineFavStore.getAll();
+        if (restaurant_id) return offlineFavStore.get(Number(restaurant_id))
+        return offlineFavStore.getAll();
 
     } catch (error) {
         console.error(error);

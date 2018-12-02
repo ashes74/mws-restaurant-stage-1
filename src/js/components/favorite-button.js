@@ -10,9 +10,11 @@ export default function favButton(restaurant) {
     button.innerHTML = '&#x2605'
     // handle accesibility 
     button.setAttribute('aria-label', `Mark ${restaurant.name} as favorite`);
+    //TODO: persist offline favorite
     button.setAttribute('aria-pressed', restaurant.is_favorite);
     //handle interaction
     button.onclick = toggleFavorite;
+    getOfflineFavorite(button, restaurant)
     return button;
 
 // `
@@ -23,6 +25,16 @@ export default function favButton(restaurant) {
 // onclick = ${toggleFavorite}
 // >★</button>
 // `
+}
+
+async function getOfflineFavorite(button, restaurant) {
+    try {
+        const offlineFave = await dbPromise.getFavoritesFromOutbox(restaurant.id)
+        if (offlineFave) button.setAttribute('aria-pressed', offlineFave.is_favorite);
+    } catch (error) {
+        console.log(error)
+        throw Error(error)
+    }
 }
 
 async function toggleFavorite() {
