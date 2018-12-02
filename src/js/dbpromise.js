@@ -1,66 +1,30 @@
-import idb from 'idb';
-
-//create DB
-const dbInit = idb.open('restaurant-reviews', 4, upgradeDb => {
-    //check that it's supported
-    if (!window.indexedDB)
-        return console.log(`IndexedDB not supported in this browser`)
-    // if supported create store
-    switch (upgradeDb.oldVersion) {
-        case 0:
-            upgradeDb.createObjectStore('restaurants', {
-                keyPath: 'id'
-            });
-        case 1:
-            upgradeDb.createObjectStore('reviews', {
-                keyPath: 'id'
-            }).createIndex('restaurant_id', 'restaurant_id');
-        case 2:
-            // Each favorite is for a single restaurant that is unique from other restaurants by id
-            upgradeDb.createObjectStore('offline-favorites', {
-                keyPath: 'restaurant_id'
-            })
-        case 3:
-            const offlineReviewStore = upgradeDb.createObjectStore('offline-reviews', {
-                autoIncrement: true
-            })
-            offlineReviewStore.createIndex('restaurant_id', 'restaurant_id', {
-                unique: false
-            })
-    }
-})
+import store from './store';
 
 //// RESTAURANTS ///
 const fetchRestaurantsFromDb = async(id) => {
     try {
-        let db = await dbInit
-        if (!db)
-            return console.log('no db exists');
+        const restaurants = await store.restaurants('readonly')
+        console.log({
+            restaurants
+        });
 
-        let tx = db.transaction('restaurants');
-        let restaurantStore = tx.objectStore('restaurants');
         return await id
-            ? restaurantStore.get(Number(id))
-            : restaurantStore.getAll();
-
+            ? restaurants.get(Number(id))
+            : restaurants.getAll();
     } catch (error) {
         console.error(error);
-
     }
 }
 
 const putRestaurant = async(networkRestaurant, forceUpdate = false) => {
     try {
-        let db = await dbInit;
-        let tx = db.transaction('restaurants', 'readwrite');
-        let restaurantStore = tx.objectStore('restaurants')
-        const idbRestaurant = await restaurantStore.get(Number(networkRestaurant.id))
-        // if forced update or restaurante doesnt yet exist in db or it's newer put in db
+        const restaurants = await store.restaurants('readwrite');
+        const idbRestaurant = await restaurants.get(Number(networkRestaurant.id))
+
         if (forceUpdate || !idbRestaurant || new Date(networkRestaurant.updatedAt) > new Date(idbRestaurant.updatedAt)) {
-            // console.log(`Putting ${networkRestaurant} in db. Forced:${forceUpdate}`)
-            restaurantStore.put(networkRestaurant)
+            restaurants.put(networkRestaurant)
         }
-        await tx.complete;
+        await restaurants.complete;
     } catch (error) {
         console.error('Error adding restaurant to store', error);
     }
@@ -74,18 +38,11 @@ const putRestaurants = async restaurants => {
 
 const fetchReviewsByRestaurantId = async restaurant_id => {
     try {
-        let db = await dbInit
-        if (!db)
-            return console.log('no db exists');
-
-        let tx = db.transaction('reviews');
-        let reviewStore = tx.objectStore('reviews');
-        let restaurantIndex = reviewStore.index('restaurant_id')
+        const reviews = await store.reviews()
+        let restaurantIndex = reviews.index('restaurant_id')
         return await restaurantIndex.getAll(Number(restaurant_id));
-
     } catch (error) {
         console.error(error);
-
     }
 }
 
@@ -97,8 +54,7 @@ const putReviews = async (reviews) => {
     console.log('Caching reviews', reviews)
     if (!reviews.push)
         reviews = [reviews]; //if not array, make array
-    const db = await dbInit;
-    const reviewStore = db.transaction('reviews', 'readwrite').objectStore('reviews');
+    const reviewStore = await store.reviews('readwrite')
     Promise.all(reviews.map(async networkReview => {
         const idbReview = await reviewStore.get(Number(networkReview.id))
         if (!idbReview || new Date(networkReview.updatedAt) > new Date(idbReview.updatedAt)) {
@@ -115,8 +71,7 @@ const putReviews = async (reviews) => {
 const getReviewsFromOutbox = async(restaurant_id) => {
     console.log('Getting reviews from outbox')
     try {
-        const db = await dbInit;
-        const offlineReviewStore = db.transaction('offline-reviews').objectStore('offline-reviews')
+        const offlineReviewStore = await store.offlineReviews()
         return await offlineReviewStore.index('restaurant_id').getAll(Number(restaurant_id));
     } catch (err) {
         console.error(err)
@@ -128,8 +83,7 @@ const getReviewsFromOutbox = async(restaurant_id) => {
  */
 const addReviewsToOutbox = async(review) => {
     try {
-        const db = await dbInit;
-        const offlineReviewStore = db.transaction('offline-reviews', 'readwrite').objectStore('offline-reviews');
+        const offlineReviewStore = await store.offlineReviews('readwrite');
         // right now, a user can only insert on review at a time and cannot edit, so always additive 
         await offlineReviewStore.add(review)
         console.log('Queuing complete');
@@ -148,8 +102,7 @@ const addReviewsToOutbox = async(review) => {
 const removeReviewsFromOutbox = async(review) => {
     try {
         console.log('Removing reviews from outbox', review)
-        const db = await dbInit;
-        const offlineReviewStore = db.transaction('offline-reviews', 'readwrite').objectStore('offline-reviews')
+        const offlineReviewStore = await store.offlineReviews('readwrite')
         await offlineReviewStore.delete(review.id);
         return await offlineReviewStore;
 
@@ -171,8 +124,7 @@ const addFavoritesToOutbox = async(favoriteObj) => {
     try {
         console.log('Queuing up favorites for background sync');
 
-        const db = await dbInit;
-        const offlineFavStore = db.transaction('offline-favorites', 'readwrite').objectStore('offline-favorites');
+        const offlineFavStore = await store.offlineFavorites('readwrite')
         await offlineFavStore.put(favoriteObj);
         console.log('Queuing complete')
         return await offlineFavStore.complete;
@@ -186,8 +138,7 @@ const addFavoritesToOutbox = async(favoriteObj) => {
 const getFavoritesFromOutbox = async(restaurant_id) => {
     try {
         console.log(`Retrieving favorites from outbox`)
-        const db = await dbInit;
-        const offlineFavStore = db.transaction('offline-favorites').objectStore('offline-favorites');
+        const offlineFavStore = await store.offlineFavorites()
         if (restaurant_id) return offlineFavStore.get(Number(restaurant_id))
         return offlineFavStore.getAll();
 
@@ -199,8 +150,7 @@ const getFavoritesFromOutbox = async(restaurant_id) => {
 
 const removeFavoritesFromOutbox = async(restaurant_id) => {
     try {
-        const db = await dbInit;
-        const offlineFavStore = db.transaction('offline-favorites', 'readwrite').objectStore('offline-favorites');
+        const offlineFavStore = await store.offlineFavorites('readwrite')
         await offlineFavStore.delete(restaurant_id);
         return await offlineFavStore.complete;
 
