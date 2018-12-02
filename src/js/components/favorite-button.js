@@ -14,7 +14,6 @@ export default function favButton(restaurant) {
     button.setAttribute('aria-pressed', restaurant.is_favorite);
     //handle interaction
     button.onclick = toggleFavorite;
-    getOfflineFavorite(button, restaurant)
     return button;
 
 // `
@@ -27,6 +26,7 @@ export default function favButton(restaurant) {
 // `
 }
 
+// Not quite working yet 
 async function getOfflineFavorite(button, restaurant) {
     try {
         const offlineFave = await dbPromise.getFavoritesFromOutbox(restaurant.id)

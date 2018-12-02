@@ -1,4 +1,5 @@
-button.fav, #restaurants-list li button.fav{
+button.fav,
+#restaurants-list li button.fav {
   background: none;
   border: none;
   color: grey;
@@ -7,7 +8,7 @@ button.fav, #restaurants-list li button.fav{
   font-size: 3em;
 
   &[aria-pressed='true'] {
-    color: yellow;
+    color: #b913d4;
   }
 
   &:hover,
@@ -16,8 +17,8 @@ button.fav, #restaurants-list li button.fav{
   }
 }
 
-#fav-button-container{
- width: 100%;
+#fav-button-container {
+  width: 100%;
   padding: 0;
   margin: 0;
   text-align: center;
