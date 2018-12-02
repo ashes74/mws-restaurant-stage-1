@@ -77,18 +77,43 @@ const handleSubmit = async (e) => {
 
     console.log(validReview);
 
-    //if valid send to Database and cache 
-    const storedReview = await DBHelper.postReview(validReview)
-    console.log(storedReview)
-    //Add to page
-    if (!storedReview.error) {
-        const reviewItemHtml = createReviewHTML(storedReview);
-        document.querySelector('#reviews-list').appendChild(reviewItemHtml);
-        //clear form 
-        clearForm()
+    //if valid send to outbox and trigger sync 
+    if (window.SyncManager && navigator.serviceWorker) {
+        console.log('Starting outbox protocol of review', validReview)
+        try {
+            //add review to outbox 
+            await dbPromise.addReviewsToOutbox(validReview)
+            //check for ready service worker 
+            console.log('Checking for service worker');
+            const reg = await navigator.serviceWorker.ready
+            //register sync tag 
+            console.log('Service worker found, registering sync-review tag', reg)
+            await reg.sync.register('sync-review')
+            console.log('Sync registered')
+            //if sync tag is successful update ui
+            addReviewToPage(validReview)
+        } catch (error) {
+            //if error, update user on status 
+            console.error('Error caching offline reviews', error)
+        }
+    } else {
+        //else send  Database and cache 
+        const storedReview = await DBHelper.postReview(validReview)
+        console.log(storedReview)
+        //Add to page
+        if (!storedReview.error) {
+            addReviewToPage(storedReview)
+        }
+        else
+            document.querySelector('#error').innerText = storedReview.msg
     }
-    else
-        document.querySelector('#error').innerText = storedReview.msg
+}
+
+function addReviewToPage(review) {
+    const reviewItemHtml = createReviewHTML(review);
+    document.querySelector('#reviews-list').appendChild(reviewItemHtml);
+    //clear form 
+    clearForm()
 }
 
 /**
@@ -128,7 +153,7 @@ function getValidFormData() {
         name: name.value,
         rating: Number(rating.value),
         comments: comments.value,
-        restaurantId: Number(form.dataset.restaurantId),
+        restaurant_id: Number(form.dataset.restaurantId),
         createdAt: new Date().toISOString()
     }
 

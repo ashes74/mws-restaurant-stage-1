@@ -256,6 +256,7 @@ export default class DBHelper {
    * @param restaurant_id : id of restaurant
    */
   static async fetchReviewsByRestaurantId(restaurant_id) {
+    const offlineReviews = await dbPromise.getReviewsFromOutbox(restaurant_id)
     // if online fetch reviews from network
     try {
       if (navigator.onLine) {
@@ -267,11 +268,13 @@ export default class DBHelper {
         if (networkResponse.ok) {
           // console.log('Network response from dbhelper')
           dbPromise.putReviews(await networkResponse.clone().json())
-          return await networkResponse.json();
+          return [...await networkResponse.json(), ...offlineReviews];
         }
       }
       // else, return reviews from cache
-      return await dbPromise.fetchReviewsByRestaurantId(restaurant_id)
+      const cachedReviews = await dbPromise.fetchReviewsByRestaurantId(restaurant_id)
+
+      return [...cachedReviews, ...offlineReviews]
     // handle errors
     } catch (err) {
       return await dbPromise.fetchReviewsByRestaurantId(restaurant_id) || console.error(err)
@@ -302,10 +305,10 @@ export default class DBHelper {
       }
     } catch (error) {
       console.log(error)
-      return {
+      return Promise.reject({
         msg: `Unable to post review to server. Please try again later`,
         error
-      }
+      })
     }
   }
 

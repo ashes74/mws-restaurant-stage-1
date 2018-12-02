@@ -1,7 +1,7 @@
 import idb from 'idb';
 
 //create DB
-const dbInit = idb.open('restaurant-reviews', 3, upgradeDb => {
+const dbInit = idb.open('restaurant-reviews', 4, upgradeDb => {
     //check that it's supported
     if (!window.indexedDB)
         return console.log(`IndexedDB not supported in this browser`)
@@ -20,20 +20,33 @@ const dbInit = idb.open('restaurant-reviews', 3, upgradeDb => {
             upgradeDb.createObjectStore('offline-favorites', {
                 keyPath: 'restaurant_id'
             })
+        case 3:
+            const offlineReviewStore = upgradeDb.createObjectStore('offline-reviews', {
+                autoIncrement: true
+            })
+            offlineReviewStore.createIndex('restaurant_id', 'restaurant_id', {
+                unique: false
+            })
     }
 })
 
 //// RESTAURANTS ///
 const fetchRestaurantsFromDb = async(id) => {
-    let db = await dbInit
-    if (!db)
-        return console.log('no db exists');
+    try {
+        let db = await dbInit
+        if (!db)
+            return console.log('no db exists');
 
-    let tx = db.transaction('restaurants');
-    let restaurantStore = tx.objectStore('restaurants');
-    return await id
-        ? restaurantStore.get(Number(id))
-        : restaurantStore.getAll();
+        let tx = db.transaction('restaurants');
+        let restaurantStore = tx.objectStore('restaurants');
+        return await id
+            ? restaurantStore.get(Number(id))
+            : restaurantStore.getAll();
+
+    } catch (error) {
+        console.error(error);
+
+    }
 }
 
 const putRestaurant = async(networkRestaurant, forceUpdate = false) => {
@@ -60,20 +73,28 @@ const putRestaurants = async restaurants => {
 //// REVIEWS ////
 
 const fetchReviewsByRestaurantId = async restaurant_id => {
-    let db = await dbInit
-    if (!db)
-        return console.log('no db exists');
+    try {
+        let db = await dbInit
+        if (!db)
+            return console.log('no db exists');
 
-    let tx = db.transaction('reviews');
-    let reviewStore = tx.objectStore('reviews');
-    let restaurantIndex = reviewStore.index('restaurant_id')
-    return await restaurantIndex.getAll(Number(restaurant_id));
+        let tx = db.transaction('reviews');
+        let reviewStore = tx.objectStore('reviews');
+        let restaurantIndex = reviewStore.index('restaurant_id')
+        return await restaurantIndex.getAll(Number(restaurant_id));
+
+    } catch (error) {
+        console.error(error);
+
+    }
 }
 
 /**
  * Save review or array of reviews to database
+ * @param {object} reviews to be cached locally
  */
 const putReviews = async (reviews) => {
+    console.log('Caching reviews', reviews)
     if (!reviews.push)
         reviews = [reviews]; //if not array, make array
     const db = await dbInit;
@@ -85,8 +106,61 @@ const putReviews = async (reviews) => {
         }
         await reviewStore.complete;
     }))
+        .catch(err => console.error('error!', err))
 }
 
+/**
+ * Get all reviews from offline store
+ */
+const getReviewsFromOutbox = async(restaurant_id) => {
+    console.log('Getting reviews from outbox')
+    try {
+        const db = await dbInit;
+        const offlineReviewStore = db.transaction('offline-reviews').objectStore('offline-reviews')
+        return await offlineReviewStore.index('restaurant_id').getAll(Number(restaurant_id));
+    } catch (err) {
+        console.error(err)
+    }
+}
+
+/**
+ * Add offline review to cache
+ */
+const addReviewsToOutbox = async(review) => {
+    try {
+        const db = await dbInit;
+        const offlineReviewStore = db.transaction('offline-reviews', 'readwrite').objectStore('offline-reviews');
+        // right now, a user can only insert on review at a time and cannot edit, so always additive 
+        await offlineReviewStore.add(review)
+        console.log('Queuing complete');
+        return await offlineReviewStore.complete;
+
+    } catch (error) {
+        console.error(error);
+
+    }
+}
+
+/**
+ * Remove offline review 
+ * @param review to remove
+ */
+const removeReviewsFromOutbox = async(review) => {
+    try {
+        console.log('Removing reviews from outbox', review)
+        const db = await dbInit;
+        const offlineReviewStore = db.transaction('offline-reviews', 'readwrite').objectStore('offline-reviews')
+        await offlineReviewStore.delete(review.id);
+        return await offlineReviewStore;
+
+    } catch (error) {
+        console.error(error);
+
+    }
+}
+
+
+//// FAVORITES ////
 /**
  * Adds favoriting action to queue for background syncing 
  * @param {object} favoriteObj 
@@ -94,27 +168,45 @@ const putReviews = async (reviews) => {
  * @param {boolean} favoriteObj.is_favorite 
  */
 const addFavoritesToOutbox = async(favoriteObj) => {
-    console.log('Queuing up favorites for background sync');
+    try {
+        console.log('Queuing up favorites for background sync');
 
-    const db = await dbInit;
-    const offlineFavStore = db.transaction('offline-favorites', 'readwrite').objectStore('offline-favorites');
-    offlineFavStore.put(favoriteObj);
-    console.log('Queuing complete')
-    return await offlineFavStore.complete;
+        const db = await dbInit;
+        const offlineFavStore = db.transaction('offline-favorites', 'readwrite').objectStore('offline-favorites');
+        await offlineFavStore.put(favoriteObj);
+        console.log('Queuing complete')
+        return await offlineFavStore.complete;
+
+    } catch (error) {
+        console.error(error);
+
+    }
 }
 
 const getFavoritesFromOutbox = async() => {
-    console.log(`Retrieving favorites from outbox`)
-    const db = await dbInit;
-    const offlineFavStore = db.transaction('offline-favorites').objectStore('offline-favorites');
-    return offlineFavStore.getAll();
+    try {
+        console.log(`Retrieving favorites from outbox`)
+        const db = await dbInit;
+        const offlineFavStore = db.transaction('offline-favorites').objectStore('offline-favorites');
+        return await offlineFavStore.getAll();
+
+    } catch (error) {
+        console.error(error);
+
+    }
 }
 
 const removeFavoritesFromOutbox = async(restaurant_id) => {
-    const db = await dbInit;
-    const offlineFavStore = db.transaction('offline-favorites', 'readwrite').objectStore('offline-favorites');
-    offlineFavStore.delete(restaurant_id);
-    return await offlineFavStore.complete;
+    try {
+        const db = await dbInit;
+        const offlineFavStore = db.transaction('offline-favorites', 'readwrite').objectStore('offline-favorites');
+        await offlineFavStore.delete(restaurant_id);
+        return await offlineFavStore.complete;
+
+    } catch (error) {
+        console.error(error);
+
+    }
 }
 
 const dbPromise = {
@@ -125,6 +217,9 @@ const dbPromise = {
     /* reviews */
     fetchReviewsByRestaurantId,
     putReviews,
+    getReviewsFromOutbox,
+    addReviewsToOutbox,
+    removeReviewsFromOutbox,
     /* favorites */
     addFavoritesToOutbox,
     getFavoritesFromOutbox,

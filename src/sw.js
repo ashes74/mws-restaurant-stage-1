@@ -42,14 +42,6 @@ self.addEventListener('fetch', async event => {
     if (requestUrl.port === '1337' && requestUrl.hostname === 'localhost')
         return //console.log("Leave it to DBHelper");
 
-    //for restaurant pages return restaurant skeleton
-    if (requestUrl.origin === location.origin) {
-        if (requestUrl.pathname.match(/^\/restaurant*.html\/*/)) {
-            console.log('Returning cached skeleton of restaurant page');
-            event.respondWith(caches.match('/restaurant.html'))
-            return
-        }
-    }
     // for all other requests return cached value or fetch from network
     event.respondWith(caches.match(event.request).then(cachedResponse => {
         return cachedResponse || fetchFromNetwork(event.request);
@@ -67,6 +59,10 @@ async function fetchFromNetwork(request) {
         }
         if (new URL(request.url).origin === location.origin) {
             if (request.method === 'GET' && networkResponse.ok) {
+                if (requestUrl.pathname.match(/^\/restaurant*.html\/*/)) {
+                    //for restaurant pages return restaurant skeleton
+                    return caches.match('/restaurant.html')
+                }
                 const cache = await caches.open(staticCacheName)
                 cache.put(request, networkResponse.clone());
             }
@@ -80,9 +76,8 @@ async function fetchFromNetwork(request) {
 }
 
 self.addEventListener('sync', async event => {
-    console.log('Sync event for', event.tag)
+    console.log('Sync event triggered for ', event.tag)
     if (event.tag == 'sync-favorite') {
-        //do something that returns a promise
         event.waitUntil(
             dbPromise.getFavoritesFromOutbox()
                 .then(async favorites => {
@@ -105,5 +100,26 @@ self.addEventListener('sync', async event => {
                         console.log(error)
                     }
                 }))
+    }
+
+    if (event.tag == 'sync-review') {
+        event.waitUntil(
+            dbPromise.getReviewsFromOutbox()
+                .then(async reviews => {
+                    try {
+                        if (!reviews.push)
+                            reviews = [reviews]
+                        console.log('Syncing network with reviews from idb', reviews)
+                        //Send over network
+                        return await Promise.all(reviews.map(
+                                DBHelper.postReview(review)
+                                    //Remove from offline store 
+                                    .then(dbPromise.removeReviewsFromOutbox)))
+
+                    } catch (error) {
+                        console.error('Error syncing reviews', error)
+                    }
+                })
+        )
     }
 })
