@@ -1,8 +1,11 @@
+import dbPromise from './js/dbpromise';
+import DBHelper from './js/dbhelper';
+
 const staticCacheName = "mws-rest-reviews-v3"
 const urlsToCache = [
     '/',
-    '/js/main.js',
-    '/js/restaurant.js',
+    '/main.js',
+    '/restaurant.js',
     '/css/styles.css',
     '/404.html',
     '/offline.html',
@@ -15,6 +18,7 @@ const urlsToCache = [
 ]
 
 self.addEventListener('install', event => {
+    console.log('Installing serviceworker')
     // Precache files on install of the service worker
     event.waitUntil(caches.open(staticCacheName).then(cache => cache.addAll(urlsToCache)).catch(err => {
         console.error(`Cache open failure: ${err}`)
@@ -22,6 +26,7 @@ self.addEventListener('install', event => {
 })
 
 self.addEventListener('activate', event => {
+    console.log('Activating serviceworker')
     // On activation, remove redundant caches to conserve on space
     event.waitUntil(caches.keys().then(cacheNames => {
         return Promise.all(cacheNames.filter(cacheName => {
@@ -32,17 +37,17 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', async event => {
     const requestUrl = new URL(event.request.url);
-    // console.log(`Fetching ${requestUrl}`); if accessing API, default to DB Helper
-    // functions
+    // console.log(`Fetching ${requestUrl}`);
+    //if accessing API, default to DB Helper functions
     if (requestUrl.port === '1337' && requestUrl.hostname === 'localhost')
         return //console.log("Leave it to DBHelper");
 
     //for restaurant pages return restaurant skeleton
     if (requestUrl.origin === location.origin) {
-        if (requestUrl.pathname.match(/^\/restaurant*/)) {
+        if (requestUrl.pathname.match(/^\/restaurant*.html\/*/)) {
             console.log('Returning cached skeleton of restaurant page');
-            const cachedResponse = await event.respondWith(caches.match('/restaurant.html'))
-            return cachedResponse || fetchFromNetwork(event.request);
+            event.respondWith(caches.match('/restaurant.html'))
+            return
         }
     }
     // for all other requests return cached value or fetch from network
@@ -73,3 +78,32 @@ async function fetchFromNetwork(request) {
     // return caches.match('/offline.html')
     }
 }
+
+self.addEventListener('sync', async event => {
+    console.log('Sync event for', event.tag)
+    if (event.tag == 'sync-favorite') {
+        //do something that returns a promise
+        event.waitUntil(
+            dbPromise.getFavoritesFromOutbox()
+                .then(async favorites => {
+                    try {
+                        // send all favorites over the network 
+                        console.log('Syncing network with idb', favorites)
+                        return Promise.all(favorites.map(fav => {
+                            return DBHelper.putFavorite(fav.restaurant_id, fav.is_favorite).then(async({response, error}) => {
+                                //if get succesful response, remove favorite from outbox
+                                if (response) {
+                                    console.log(`Syncing ${fav} was successful, removing from idb`)
+                                    // remove fav from outbox 
+                                    return await dbPromise.removeFavoritesFromOutbox(fav.restaurant_id)
+                                }
+                                //else leave it in outbox 
+                                else console.log('unsuccessful sync', error)
+                            })
+                        }))
+                    } catch (error) {
+                        console.log(error)
+                    }
+                }))
+    }
+})

@@ -3,11 +3,12 @@
  */
 export function registerServiceWorker() {
     if (navigator.serviceWorker) {
+        console.log('registering serviceworker')
         navigator
             .serviceWorker
             .register('/sw.js')
             .then(registration => console.log(`Registration successful`, registration))
-            .catch(err => console.log(`Registratation failed ${err}`))
+            .catch(err => console.log(`Registratation failed ${err}`));
     }
 }
 

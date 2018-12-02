@@ -2,11 +2,6 @@ import DBHelper from './dbhelper';
 import favoriteButton from "./components/favorite-button";
 import reviewForm from "./components/review-form";
 
-let restaurants,
-  neighborhoods,
-  cuisines
-var newMap
-var markers = []
 /**
  * Initialize map as soon as the page is loaded.
  */

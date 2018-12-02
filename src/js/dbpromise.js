@@ -1,7 +1,7 @@
 import idb from 'idb';
 
 //create DB
-const dbInit = idb.open('restaurant-reviews', 2, upgradeDb => {
+const dbInit = idb.open('restaurant-reviews', 3, upgradeDb => {
     //check that it's supported
     if (!window.indexedDB)
         return console.log(`IndexedDB not supported in this browser`)
@@ -15,6 +15,11 @@ const dbInit = idb.open('restaurant-reviews', 2, upgradeDb => {
             upgradeDb.createObjectStore('reviews', {
                 keyPath: 'id'
             }).createIndex('restaurant_id', 'restaurant_id');
+        case 2:
+            // Each favorite is for a single restaurant that is unique from other restaurants by id
+            upgradeDb.createObjectStore('offline-favorites', {
+                keyPath: 'restaurant_id'
+            })
     }
 })
 
@@ -82,6 +87,36 @@ const putReviews = async (reviews) => {
     }))
 }
 
+/**
+ * Adds favoriting action to queue for background syncing 
+ * @param {object} favoriteObj 
+ * @param {Number} favoriteObj.restaurant_id id of restaurant
+ * @param {boolean} favoriteObj.is_favorite 
+ */
+const addFavoritesToOutbox = async(favoriteObj) => {
+    console.log('Queuing up favorites for background sync');
+
+    const db = await dbInit;
+    const offlineFavStore = db.transaction('offline-favorites', 'readwrite').objectStore('offline-favorites');
+    offlineFavStore.put(favoriteObj);
+    console.log('Queuing complete')
+    return await offlineFavStore.complete;
+}
+
+const getFavoritesFromOutbox = async() => {
+    console.log(`Retrieving favorites from outbox`)
+    const db = await dbInit;
+    const offlineFavStore = db.transaction('offline-favorites').objectStore('offline-favorites');
+    return offlineFavStore.getAll();
+}
+
+const removeFavoritesFromOutbox = async(restaurant_id) => {
+    const db = await dbInit;
+    const offlineFavStore = db.transaction('offline-favorites', 'readwrite').objectStore('offline-favorites');
+    offlineFavStore.delete(restaurant_id);
+    return await offlineFavStore.complete;
+}
+
 const dbPromise = {
     /*restaurants*/
     fetchRestaurantsFromDb,
@@ -90,6 +125,10 @@ const dbPromise = {
     /* reviews */
     fetchReviewsByRestaurantId,
     putReviews,
+    /* favorites */
+    addFavoritesToOutbox,
+    getFavoritesFromOutbox,
+    removeFavoritesFromOutbox
 }
 
 export default dbPromise;

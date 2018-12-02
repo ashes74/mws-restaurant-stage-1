@@ -334,6 +334,7 @@ export default class DBHelper {
           }
         } else {
           //return error 
+          console.log(`Error posting favorite action to network. Status: ${networkResponse.status}`)
           return {
             error: `Error posting favorite action to network. Status: ${networkResponse.status}`
           }

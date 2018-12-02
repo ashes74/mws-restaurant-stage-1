@@ -13,8 +13,8 @@
   },
 
   "javascripts": {
-    "src": "js",
-    "dest": "js"
+    "src": "./",
+    "dest": "./"
   },
 
   "stylesheets": {

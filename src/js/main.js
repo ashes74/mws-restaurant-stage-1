@@ -2,12 +2,6 @@ import DBHelper from './dbhelper';
 import { registerServiceWorker } from '../register';
 import favoriteButton from "./components/favorite-button";
 
-let restaurants,
-  neighborhoods,
-  cuisines;
-var newMap;
-var markers = [];
-
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
@@ -82,7 +76,7 @@ const fillCuisinesHTML = (cuisines = self.cuisines) => {
 const initMap = () => {
   if (navigator.onLine) {
     try {
-      self.newMap = L.map('map', {
+      self.self.newMap = L.map('map', {
         center: [
           40.722216, -73.987501
         ],
@@ -100,7 +94,7 @@ const initMap = () => {
               ' Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             id: 'mapbox.streets'
           })
-        .addTo(self.newMap);
+        .addTo(self.self.newMap);
     } catch (err) {
       console.log(`Error initializing map ${err}`);
     }
@@ -200,7 +194,7 @@ const createRestaurantHTML = (restaurant) => {
  * Add markers for current restaurants to the map.
  */
 const addMarkersToMap = (restaurants = self.restaurants) => {
-  if (!L || !newMap)
+  if (!L || !self.newMap)
     return; //if no map exist while offline, exit early
   restaurants.forEach(restaurant => {
     // Add marker to the map

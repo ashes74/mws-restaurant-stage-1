@@ -27,12 +27,36 @@ export default function favButton(restaurant) {
 
 async function toggleFavorite() {
     console.log(this)
-    const restaurantId = this.dataset.id;
-    const fav = this.getAttribute('aria-pressed') == 'true'; //coerce string bool to real bool
+    const restaurant_id = this.dataset.id;
+    const curr_is_favorite = (this.getAttribute('aria-pressed') == 'true'); //coerce string bool to real bool
+    const new_is_favorite = !curr_is_favorite
 
-    const {isFavorite, error} = await DBHelper.putFavorite(restaurantId, !fav);
+    if (window.SyncManager && navigator.serviceWorker) {
+        try {
+            // add favoriting to outbox
+            await dbPromise.addFavoritesToOutbox({
+                restaurant_id,
+                is_favorite: new_is_favorite,
+                updatedAt: new Date().toISOString()
+            })
+            console.log('Checking for serviceworker')
+            // Wait for the scoped service worker registration to get a
+            // service worker with an active state
+            const reg = await navigator.serviceWorker.ready;
 
-    //update button state if no error 
-    return error ? console.log(error) : this.setAttribute('aria-pressed', isFavorite);
-
+            console.log('registering sync tag', reg)
+            await reg.sync.register('sync-favorite')
+            // if outboxing successful, update UI 
+            console.log('Sync registered!');
+            this.setAttribute('aria-pressed', new_is_favorite);
+        } catch (error) {
+            console.log('Sync registration failed :(');
+            console.log(error);
+        }
+    } else {
+        // if service worker and background sync not supported just fetch, PUT and update as normal
+        const {error} = await DBHelper.putFavorite(restaurant_id, new_is_favorite);
+        //update button state if no error 
+        return error ? console.log(error) : this.setAttribute('aria-pressed', new_is_favorite);
+    }
 }

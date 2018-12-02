@@ -10,13 +10,21 @@ module.exports = {
   javascripts: {
     entry: {
       // files paths are relative to javascripts.dest in path-config.json
-      main: ["./main.js"],
-      restaurant: ["./restaurant_info.js"]
+      main: ["./js/main.js"],
+      restaurant: ["./js/restaurant_info.js"],
+      sw: ["./sw.js"]
     },
     babel: {
       presets: ["@babel/preset-env"],
       plugins: ['@babel/plugin-transform-runtime']
+    },
+    hot: {
+      enabled: false,
+      reload: true,
+      quiet: true,
+      react: false
     }
+
 
   },
 
