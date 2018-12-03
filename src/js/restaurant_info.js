@@ -132,9 +132,6 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   console.log(reviews);
 
   const container = document.getElementById('reviews-container');
-  const title = document.createElement('h3');
-  title.innerHTML = 'Reviews';
-  container.appendChild(title);
 
   if (!reviews) {
     const noReviews = document.createElement('p');
@@ -146,14 +143,8 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   reviews.forEach(review => {
     ul.appendChild(createReviewHTML(review));
   });
-  container.appendChild(ul);
 
-  const formDiv = document.createElement('div');
-  const id = getParameterByName('id');
-  formDiv.innerHTML = "<h3> Speak your truth </h3>"
-  formDiv.append(reviewForm(id))
-
-  container.appendChild(formDiv)
+  reviewForm(getParameterByName('id'))
 }
 
 /**

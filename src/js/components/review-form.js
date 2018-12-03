@@ -3,69 +3,10 @@ import dbPromise from "../dbpromise";
 
 export default function reviewForm(restaurantId) {
 
-    const form = document.createElement('form');
-    form.id = "review-form";
-    form.dataset.restaurantId = restaurantId;
-
-    const error = document.createElement('p');
-    error.id = 'error';
-    form.appendChild(error)
-    let p = document.createElement('p');
-    const name = document.createElement('input');
-    name.id = "name"
-    name.setAttribute('type', 'text');
-    name.setAttribute('aria-label', 'Name');
-    name.setAttribute('placeholder', 'Enter Your Name');
-    name.setAttribute('required', true)
-    p.appendChild(name);
-    form.appendChild(p);
-
-    p = document.createElement('p');
-    const selectLabel = document.createElement('label');
-    selectLabel.setAttribute('for', 'rating');
-    selectLabel.innerText = "Rate this restaurant: ";
-    p.appendChild(selectLabel);
-    const select = document.createElement('select');
-    select.id = "rating";
-    select.name = "rating";
-    select.classList.add('rating');
-    ["--", 1, 2, 3, 4, 5].forEach(number => {
-        const option = document.createElement('option');
-        option.value = number;
-        option.innerHTML = number;
-        if (number === "--") {
-            option.selected = true;
-            option.disabled = true;
-            option.hidden = true;
-        }
-        select.appendChild(option);
-    });
-    select.setAttribute('required', true)
-    p.appendChild(select);
-    form.appendChild(p);
-
-    p = document.createElement('p');
-    const textarea = document.createElement('textarea');
-    textarea.id = "comments";
-    textarea.setAttribute('aria-label', 'comments');
-    textarea.setAttribute('placeholder', 'Enter your truth here');
-    textarea.setAttribute('rows', '10');
-    textarea.setAttribute('required', true)
-    p.appendChild(textarea);
-    form.appendChild(p);
-
-    p = document.createElement('p');
-    const addButton = document.createElement('button');
-    addButton.setAttribute('type', 'submit');
-    addButton.setAttribute('aria-label', 'Add Review');
-    addButton.classList.add('add-review');
-    addButton.innerHTML = "<span>Leave Your Impressions</span>";
-    p.appendChild(addButton);
-    form.appendChild(p);
-
-    form.onsubmit = handleSubmit;
-
-    return form
+    const form = document.querySelector('#review-form');
+    form.setAttribute('data-restaurant-id', restaurantId);
+    form.addEventListener('submit', handleSubmit)
+    return
 }
 
 const handleSubmit = async (e) => {
@@ -135,12 +76,10 @@ function getValidFormData() {
     console.log('Validating form');
     const form = document.querySelector('#review-form');
     const error = document.querySelector('#error');
-    console.log(form.elements)
     //get form elements 
     const {name, rating, comments} = form.elements;
     //reject empty rating, other invalid entries handled by browser
     if (!Number(rating.value)) {
-        console.log('invalid rating', rating.value)
         rating.invalid = true;
         rating.focus();
         error.innerText = "Please add a rating"

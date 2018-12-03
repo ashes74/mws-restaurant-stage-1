@@ -65,14 +65,16 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-}
-#reviews-container h2 {
-  color: #f58500;
-  font-size: 24pt;
-  font-weight: 300;
-  letter-spacing: -1px;
-  padding-bottom: 1pt;
-  width: 90%;
+
+  h2 {
+    text-align: center;
+    color: #e2581f;
+    font-size: 24pt;
+    font-weight: 300;
+    letter-spacing: -1px;
+    padding-bottom: 1pt;
+    width: 90%;
+  }
 }
 #reviews-list {
   margin: 0;
@@ -104,4 +106,35 @@
 
 #restaurant-hours td {
   color: #666;
+}
+
+/* ==== REVIW FORM =====*/
+
+#review-form {
+  width: 30vw;
+  text-align: center;
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+    border-radius: 0;
+    margin: 0;
+    box-sizing: border-box;
+
+    &:valid {
+      border: 1px solid black;
+    }
+  }
+
+  option {
+    [value='--'][disabled] {
+      display: none;
+    }
+  }
+
+  #error {
+    font: 800 1em;
+    color: red;
+  }
 }

@@ -20,7 +20,6 @@
       href="./css/under800.css"
       media="screen and (min-width:521px) and (max-width:800px)"
     />
-    <link rel="stylesheet" href="./css/reviewForm.css" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
@@ -81,7 +80,46 @@
       <!-- end restaurant -->
       <!-- Beginning reviews -->
       <section id="reviews-container" role="contentinfo">
+        <h2>Reviews</h2>
         <ul id="reviews-list"></ul>
+        <form id="review-form">
+          <h2>Speak your truth</h2>
+          <p id="error"></p>
+          <p>
+            <input
+              id="name"
+              type="text"
+              aria-label="Name"
+              placeholder="Enter Your Name"
+              required="true"
+            />
+          </p>
+          <p>
+            <label for="rating">Rate this restaurant </label>
+            <select id="rating" name="rating" class="rating" required="true">
+              <option value="--" disabled="" hidden="" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option></select
+            >
+          </p>
+          <p>
+            <textarea
+              id="comments"
+              aria-label="comments"
+              placeholder="Enter your truth here"
+              rows="5"
+              required="true"
+            ></textarea>
+          </p>
+          <p>
+            <button type="submit" aria-label="Add Review" class="add-review">
+              <span>Leave Your Impressions</span>
+            </button>
+          </p>
+        </form>
       </section>
       <!-- End reviews -->
     </main>

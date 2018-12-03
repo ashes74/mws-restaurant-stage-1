@@ -32,7 +32,6 @@ async function toggleFavorite() {
             const reg = await navigator.serviceWorker.ready;
             await reg.sync.register('sync-favorite')
             // if outboxing successful, update UI 
-            console.log('Sync registered!');
             this.setAttribute('aria-pressed', new_is_favorite);
         } catch (error) {
             console.log(error);
