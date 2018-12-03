@@ -72,7 +72,9 @@ const getReviewsFromOutbox = async(restaurant_id) => {
     console.log('Getting reviews from outbox')
     try {
         const offlineReviewStore = await store.offlineReviews()
-        return await offlineReviewStore.index('restaurant_id').getAll(Number(restaurant_id));
+        if (restaurant_id) //TO DO improve logic
+            return await offlineReviewStore.index('restaurant_id').getAll(Number(restaurant_id));
+        else return await offlineReviewStore.index('restaurant_id').getAll();
     } catch (err) {
         console.error(err)
     }

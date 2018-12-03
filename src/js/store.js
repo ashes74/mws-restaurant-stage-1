@@ -7,35 +7,38 @@ const store = {
 
     init: function() {
         if (store.db) return Promise.resolve(store.db);
-        //check that it's supported
-        if (!window.indexedDB)
-            return console.log(`IndexedDB not supported in this browser`);
-
-        return idb.open('restaurant-reviews', 4, upgradeDb => {
-            // if supported create store
-            switch (upgradeDb.oldVersion) {
-                case 0:
-                    upgradeDb.createObjectStore('restaurants', {
-                        keyPath: 'id'
-                    });
-                case 1:
-                    upgradeDb.createObjectStore('reviews', {
-                        keyPath: 'id'
-                    }).createIndex('restaurant_id', 'restaurant_id');
-                case 2:
-                    // Each favorite is for a single restaurant that is unique from other restaurants by id
-                    upgradeDb.createObjectStore('offline-favorites', {
-                        keyPath: 'restaurant_id'
-                    })
-                case 3:
-                    const offlineReviewStore = upgradeDb.createObjectStore('offline-reviews', {
-                        autoIncrement: true
-                    })
-                    offlineReviewStore.createIndex('restaurant_id', 'restaurant_id', {
-                        unique: false
-                    })
-            }
-        })
+        //check that it's supported - creating a bug??? window not defined
+        // if (window && !window.indexedDB)
+        //     return console.log(`IndexedDB not supported in this browser`);
+        try {
+            return idb.open('restaurant-reviews', 4, upgradeDb => {
+                // if supported create store
+                switch (upgradeDb.oldVersion) {
+                    case 0:
+                        upgradeDb.createObjectStore('restaurants', {
+                            keyPath: 'id'
+                        });
+                    case 1:
+                        upgradeDb.createObjectStore('reviews', {
+                            keyPath: 'id'
+                        }).createIndex('restaurant_id', 'restaurant_id');
+                    case 2:
+                        // Each favorite is for a single restaurant that is unique from other restaurants by id
+                        upgradeDb.createObjectStore('offline-favorites', {
+                            keyPath: 'restaurant_id'
+                        })
+                    case 3:
+                        const offlineReviewStore = upgradeDb.createObjectStore('offline-reviews', {
+                            autoIncrement: true
+                        })
+                        offlineReviewStore.createIndex('restaurant_id', 'restaurant_id', {
+                            unique: false
+                        })
+                }
+            })
+        } catch (err) {
+            return console.error(err)
+        }
     },
 
     /**

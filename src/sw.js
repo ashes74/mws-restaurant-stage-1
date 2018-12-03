@@ -12,7 +12,6 @@ const urlsToCache = [
     '/offline.html',
     '/restaurant.html',
     '/css/favoriteButtonStyles.css',
-    '/css/reviewForm.css'
 ]
 self.addEventListener('install', event => {
     console.log('Installing serviceworker')
@@ -130,21 +129,22 @@ self.addEventListener('sync', async event => {
     if (event.tag == 'sync-review') {
         event.waitUntil(
             dbPromise.getReviewsFromOutbox()
-                .then(async reviews => {
+                .then(async (reviews = []) => {
+                    if (!reviews) return;
+                    if (!reviews.push)
+                        reviews = [reviews]
                     try {
-                        if (reviews && !reviews.push)
-                            reviews = [reviews]
                         console.log('Syncing network with reviews from idb', reviews)
                         //Send over network
-                        return await Promise.all(reviews.map(
-                                DBHelper.postReview(review)
-                                    //Remove from offline store 
-                                    .then(dbPromise.removeReviewsFromOutbox)))
+                        return await Promise.all(reviews.map(review => DBHelper.postReview(review)
+                                //Remove from offline store 
+                                .then(dbPromise.removeReviewsFromOutbox)))
 
                     } catch (error) {
                         console.error('Error syncing reviews', error)
                     }
                 })
+                .catch(err => console.error(err))
         )
     }
 })
