@@ -1,3 +1,4 @@
+const CompressionPlugin = require('compression-webpack-plugin');
 module.exports = {
   html: false,
   images: true,
@@ -41,7 +42,16 @@ module.exports = {
   browserSync: {
     server: {
       // should match `dest` in path-config.json
-      baseDir: 'dist'
+      baseDir: 'dist',
+
+    }
+  },
+
+  development: {
+    plugins: () => {
+      return [new CompressionPlugin({
+        algorithm: 'gzip'
+      })]
     }
   },
 
