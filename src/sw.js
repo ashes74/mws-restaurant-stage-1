@@ -3,8 +3,6 @@ import DBHelper from './js/dbhelper';
 
 const version = 'v4'
 const staticCacheName = `mws-rest-reviews-${version}`
-// const contentImagesCache = `mws-rest-reviews-images-${version}`
-
 const urlsToCache = [
     '/',
     '/main.js',
@@ -16,7 +14,6 @@ const urlsToCache = [
     '/css/favoriteButtonStyles.css',
     '/css/reviewForm.css'
 ]
-
 self.addEventListener('install', event => {
     console.log('Installing serviceworker')
     // Precache files on install of the service worker
@@ -85,20 +82,14 @@ async function fetchFromNetwork(request) {
         return caches.match('/offline.html')
     }
 }
-
 //from Alexandro Perez
 async function serveImages(request) {
     try {
         let imageCacheUrl = request.url;
-
-        // Make a new URL with a stripped suffix and extension from the request url
-        // i.e. /img/1-medium.jpg  will become  /img/1
-        // we'll use this as the KEY for storing image into cache
         imageCacheUrl = imageCacheUrl.replace(/-small\.\w{3}|-medium\.\w{3}|-large\.\w{3}/i, '');
 
         const cache = await caches.open(staticCacheName)
         const response = await cache.match(imageCacheUrl)
-        // if image is in cache, return it, else fetch from network, cache a clone, then return network response
         return response || fetch(request).then(function(networkResponse) {
                 cache.put(imageCacheUrl, networkResponse.clone());
                 return networkResponse;
