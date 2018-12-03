@@ -13,6 +13,9 @@ const urlsToCache = [
     '/404.html',
     '/offline.html',
     '/restaurant.html',
+    '/leaflet.js',
+    '/css/favoriteButtonStyles.css',
+    '/css/reviewForm.css'
 ]
 
 self.addEventListener('install', event => {
