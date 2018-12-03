@@ -1,12 +1,14 @@
 import DBHelper from './dbhelper';
 import favoriteButton from "./components/favorite-button";
 import reviewForm from "./components/review-form";
+import { registerServiceWorker } from '../register';
 
 /**
  * Initialize map as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   initMap();
+  registerServiceWorker();
 });
 
 /**
