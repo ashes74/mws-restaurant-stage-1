@@ -12,7 +12,8 @@ module.exports = {
       // files paths are relative to javascripts.dest in path-config.json
       main: ["./js/main.js"],
       restaurant: ["./js/restaurant_info.js"],
-      sw: ["./sw.js"]
+      sw: ["./sw.js"],
+      leaflet: ["./js/leaflet.js"]
     },
     babel: {
       presets: ["@babel/preset-env"],
