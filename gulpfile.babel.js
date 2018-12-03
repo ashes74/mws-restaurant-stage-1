@@ -10,19 +10,19 @@ export function jpgImages() {
         .pipe(responsive({
             // Resize all jpg images to three different sizes: 300, 600 and 800
             '**/*.jpg': [{
-                width: 600,
+                width: 480,
                 quality: 70,
                 rename: {
                     suffix: '-large'
                 }
             }, {
-                width: 400,
+                width: 300,
                 quality: 50,
                 rename: {
                     suffix: '-medium'
                 }
             }, {
-                width: 200,
+                width: 100,
                 quality: 40,
                 rename: {
                     suffix: '-small'
