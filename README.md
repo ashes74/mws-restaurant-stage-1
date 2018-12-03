@@ -10,7 +10,7 @@ Requirements: Node, Yarn / NPM
 2. Install this app (`yarn install` or `npm install`)
 3. Run `yarn start` to serve app on `localhost:3000`
 
-## Manifest and icons generated here: https://app-manifest.firebaseapp.com/
+Manifest and icons generated here: https://app-manifest.firebaseapp.com/
 
 #### _Three Stage Course Material Project - Restaurant Reviews_
 
