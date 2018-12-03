@@ -20,3 +20,13 @@ All the requirements to stage 2, plus
 
 - Adds offline editing of faves and reviews
 - Performance, PWA and Accessibility points over 90%
+
+### Troubleshooting
+
+- if `yarn start` is erroring out with a gulp error. uninstall gulp and reinstall blendid
+
+```
+yarn remove gulp
+yarn add blendid
+yarn start
+```
