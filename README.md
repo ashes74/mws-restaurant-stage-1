@@ -23,7 +23,8 @@ All the requirements to stage 2, plus
 
 ### Troubleshooting
 
-- if `yarn start` is erroring out with a gulp error. uninstall gulp and reinstall blendid
+- if `yarn start` is erroring out with a gulp error:
+  There is a bug where the gulpfile (used for compressing images) uses a different version than the task file that serves the app (blendid). Steps to fix = uninstall gulp and reinstall blendid. Run:
 
 ```
 yarn remove gulp
