@@ -12,6 +12,9 @@ const urlsToCache = [
     '/offline.html',
     '/restaurant.html',
     '/css/favoriteButtonStyles.css',
+    '/img/offline-small.jpg',
+    'css/other.css'
+
 ]
 self.addEventListener('install', event => {
     console.log('Installing serviceworker')
