@@ -132,7 +132,7 @@ self.addEventListener('sync', async event => {
             dbPromise.getReviewsFromOutbox()
                 .then(async reviews => {
                     try {
-                        if (!reviews.push)
+                        if (reviews && !reviews.push)
                             reviews = [reviews]
                         console.log('Syncing network with reviews from idb', reviews)
                         //Send over network
